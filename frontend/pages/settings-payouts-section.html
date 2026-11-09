@@ -1,0 +1,42 @@
+<!-- W settings.html podmień całą sekcję <section class="settings-card" id="payouts"> ... </section> na tę -->
+<section class="settings-card" id="payouts">
+  <div class="settings-card-header">
+    <div>
+      <span class="settings-eyebrow">Płatności</span>
+
+      <h2>Konto bankowe do wypłat</h2>
+
+      <p>
+        Dodaj konto, aby w ogłoszeniach sprzedaży włączyć płatność przez
+        JollyCart. Dane podajesz bezpośrednio operatorowi płatności (Stripe),
+        JollyCart nie zapisuje numeru Twojego konta. Możesz to zrobić tutaj,
+        w aplikacji, albo na stronie Stripe.
+      </p>
+    </div>
+  </div>
+
+  <p id="payouts-status" class="settings-help">Sprawdzanie statusu...</p>
+
+  <div id="payouts-message" class="settings-message" aria-live="polite"></div>
+
+  <div class="settings-actions">
+    <button type="button" class="settings-save-button" id="payouts-embedded-button" hidden>
+      Dodaj konto w aplikacji
+    </button>
+
+    <button type="button" class="settings-secondary-button" id="payouts-redirect-button" hidden>
+      Dodaj konto przez Stripe
+    </button>
+  </div>
+
+  <!-- Formularz Stripe osadzony w aplikacji -->
+  <div id="payouts-embedded" class="payouts-embedded" hidden>
+    <div id="payouts-embedded-container"></div>
+
+    <div class="settings-actions">
+      <button type="button" class="settings-secondary-button" id="payouts-embedded-close">
+        Zamknij
+      </button>
+    </div>
+  </div>
+</section>

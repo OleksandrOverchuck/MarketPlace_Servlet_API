@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rozmowy - JollyCart</title>
+    <script>
+      if (localStorage.getItem("loggedIn") === "1") {
+        document.documentElement.classList.add("logged-in");
+      }
+    </script>
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/conversations.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="container nav-container">
+        <div class="logo">
+          <a href="index.html" class="logo-link">
+            <svg
+              class="logo-icon"
+              width="45"
+              height="45"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M14 9 Q15 6 18 7"
+                stroke="#2f6b3a"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                fill="none"
+              />
+              <circle cx="16" cy="11" r="5.5" fill="#e2574c" />
+              <path d="M25 4 L29.5 14 L20.5 14 Z" fill="#e8a33d" />
+              <circle cx="32" cy="12" r="5" fill="#5b8c3e" />
+              <path
+                d="M6 14H10L14.5 33H35"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M13 19H37.5L34.5 31H16.5"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle cx="19" cy="39" r="3" fill="#0e5c53" />
+              <circle cx="31" cy="39" r="3" fill="#0e5c53" />
+            </svg>
+            <span class="logo-text">JollyCart</span>
+          </a>
+        </div>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="index.html">Strona główna</a></li>
+            <li>
+              <div id="auth-user">
+                <a href="login.html" class="auth-login-link">Logowanie</a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+        <button
+          class="menu-toggle"
+          onclick="toggleMenu()"
+          aria-label="Otwórz menu"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <main class="cv-page">
+      <section class="cv-hero">
+        <div class="container cv-hero-inner">
+          <span class="cv-badge">TWOJE KONTO</span>
+          <h1>Rozmowy</h1>
+          <p>
+            Wszystkie Twoje konwersacje w jednym miejscu, z podziałem na
+            ogłoszenia i aplikacje.
+          </p>
+        </div>
+      </section>
+
+      <div class="container cv-body">
+        <div class="cv-tabs" role="tablist" aria-label="Rodzaj rozmów">
+          <button
+            type="button"
+            role="tab"
+            class="cv-tab is-active"
+            id="cv-tab-mine"
+            data-tab="mine"
+            aria-selected="true"
+          >
+            <span class="cv-tab-count" id="cv-count-mine">0</span>
+            <span class="cv-tab-text">
+              <strong>Dotyczące moich ogłoszeń</strong>
+              <small>Ktoś pisze w sprawie Twojego ogłoszenia</small>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            class="cv-tab"
+            id="cv-tab-applied"
+            data-tab="applied"
+            aria-selected="false"
+          >
+            <span class="cv-tab-count" id="cv-count-applied">0</span>
+            <span class="cv-tab-text">
+              <strong>Dotyczące moich aplikacji</strong>
+              <small>Ty piszesz w sprawie cudzego ogłoszenia</small>
+            </span>
+          </button>
+        </div>
+
+        <div id="cv-message" class="cv-message" aria-live="polite"></div>
+
+        <div id="cv-list" class="cv-list" aria-busy="true">
+          <div class="cv-skeleton"></div>
+          <div class="cv-skeleton"></div>
+          <div class="cv-skeleton"></div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../scripts/animation/menuToggle.js"></script>
+    <script src="../scripts/auth/auth.js"></script>
+    <script src="../scripts/profile/profile-links.js"></script>
+    <script src="../scripts/chat/conversations.js"></script>
+  </body>
+</html>

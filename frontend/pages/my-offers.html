@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moje ogłoszenia - JollyCart</title>
+    <script>
+      if (localStorage.getItem("loggedIn") === "1") {
+        document.documentElement.classList.add("logged-in");
+      }
+    </script>
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/my-offers.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="container nav-container">
+        <div class="logo">
+          <a href="index.html" class="logo-link">
+            <svg class="logo-icon" width="45" height="45" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M14 9 Q15 6 18 7" stroke="#2f6b3a" stroke-width="1.6" stroke-linecap="round" fill="none" />
+              <circle cx="16" cy="11" r="5.5" fill="#e2574c" />
+              <path d="M25 4 L29.5 14 L20.5 14 Z" fill="#e8a33d" />
+              <circle cx="32" cy="12" r="5" fill="#5b8c3e" />
+              <path d="M6 14H10L14.5 33H35" stroke="#0e5c53" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M13 19H37.5L34.5 31H16.5" stroke="#0e5c53" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="19" cy="39" r="3" fill="#0e5c53" />
+              <circle cx="31" cy="39" r="3" fill="#0e5c53" />
+            </svg>
+            <span class="logo-text">JollyCart</span>
+          </a>
+        </div>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="index.html">Strona główna</a></li>
+            <li><div id="auth-user"><a href="login.html" class="auth-login-link">Logowanie</a></div></li>
+          </ul>
+        </nav>
+        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Otwórz menu">☰</button>
+      </div>
+    </header>
+
+    <main class="my-offers-page">
+      <section class="my-offers-hero">
+        <div class="container my-offers-heading">
+          <div>
+            <h1>Moje ogłoszenia</h1>
+            <p>Przeglądaj, edytuj i usuwaj ogłoszenia dodane z Twojego konta.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="container my-offers-body">
+        <div id="my-offers-filters" class="my-offers-filters" role="group" aria-label="Filtruj ogłoszenia według statusu" hidden>
+          <button type="button" class="my-offers-filter is-active" data-filter="ALL" aria-pressed="true">
+            <strong data-count="ALL">0</strong>
+            <span>Wszystkie</span>
+          </button>
+          <button type="button" class="my-offers-filter" data-filter="ACTIVE" aria-pressed="false">
+            <strong data-count="ACTIVE">0</strong>
+            <span>Aktywne</span>
+          </button>
+          <button type="button" class="my-offers-filter" data-filter="INACTIVE" aria-pressed="false">
+            <strong data-count="INACTIVE">0</strong>
+            <span>Nieaktywne</span>
+          </button>
+          <button type="button" class="my-offers-filter" data-filter="SOLD" aria-pressed="false">
+            <strong data-count="SOLD">0</strong>
+            <span>Sprzedane</span>
+          </button>
+        </div>
+
+        <div id="my-offers-message" class="my-offers-message" aria-live="polite"></div>
+        <div id="my-offers-grid" class="my-offers-grid" aria-busy="true"></div>
+      </div>
+    </main>
+
+    <script src="../scripts/animation/menuToggle.js"></script>
+    <script src="../scripts/auth/auth.js"></script>
+    <script src="../scripts/offers/my-offers.js"></script>
+  </body>
+</html>

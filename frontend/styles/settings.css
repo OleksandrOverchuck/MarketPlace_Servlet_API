@@ -1,0 +1,823 @@
+/* =========================================================
+   USTAWIENIA PROFILU
+   ========================================================= */
+
+.settings-page {
+  min-height: calc(100vh - 82px);
+
+  padding: 40px 20px 96px;
+
+  background: var(--paper);
+}
+
+.settings-container {
+  width: 100%;
+  max-width: 920px;
+
+  margin: 0 auto;
+}
+
+.visually-hidden {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  margin: -1px;
+  padding: 0;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+/* =========================
+   BANER PROFILU
+   ========================= */
+
+.settings-hero {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 34px;
+
+  margin-bottom: 26px;
+  padding: 40px 44px;
+
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  background: linear-gradient(
+    135deg,
+    #0f6b5f 0%,
+    var(--teal) 55%,
+    #0a4a43 100%
+  );
+  color: var(--white);
+
+  box-shadow: 0 18px 40px rgba(9, 63, 56, 0.22);
+}
+
+.settings-hero::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background-image: repeating-linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.06) 0,
+    rgba(255, 255, 255, 0.06) 26px,
+    transparent 26px,
+    transparent 52px
+  );
+
+  pointer-events: none;
+}
+
+.settings-hero::after {
+  content: "";
+
+  position: absolute;
+  right: -90px;
+  bottom: -130px;
+
+  width: 340px;
+  height: 340px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(227, 166, 60, 0.4) 0%,
+    rgba(227, 166, 60, 0) 70%
+  );
+
+  pointer-events: none;
+}
+
+.settings-hero-avatar-wrap {
+  position: relative;
+  z-index: 1;
+
+  flex-shrink: 0;
+
+  padding: 6px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 253, 247, 0.22);
+}
+
+.settings-heading-avatar,
+.settings-avatar-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  background: #dfeee9;
+  color: var(--teal-dark);
+
+  flex-shrink: 0;
+}
+
+.settings-heading-avatar {
+  width: 132px;
+  height: 132px;
+
+  border: 4px solid var(--white);
+}
+
+.settings-heading-avatar svg {
+  width: 64px;
+  height: 64px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.settings-heading-avatar img,
+.settings-avatar-large img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.settings-hero-text {
+  position: relative;
+  z-index: 1;
+
+  min-width: 0;
+}
+
+.settings-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 5px 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--white);
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.settings-badge svg {
+  width: 14px;
+  height: 14px;
+
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.settings-hero h1 {
+  margin: 14px 0 6px;
+
+  color: var(--white);
+
+  font-size: 42px;
+  line-height: 1.08;
+}
+
+.settings-hero p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.85);
+
+  font-size: 17px;
+}
+
+/* =========================
+   KARTY
+   ========================= */
+
+.settings-card {
+  margin-bottom: 24px;
+  padding: 34px 36px;
+
+  background: var(--white);
+
+  border: 1px solid var(--line);
+  border-radius: 16px;
+
+  box-shadow: 0 10px 28px rgba(28, 35, 33, 0.06);
+}
+
+.settings-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+
+  border-bottom: 1px solid var(--line);
+}
+
+.settings-card-icon {
+  flex: 0 0 48px;
+
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #dfeee9;
+  color: var(--teal-dark);
+}
+
+.settings-card-icon svg {
+  width: 24px;
+  height: 24px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.settings-eyebrow {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--teal);
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-card h2 {
+  margin: 0;
+
+  font-size: 25px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.settings-card-header p {
+  margin: 4px 0 0;
+
+  color: var(--ink-soft);
+
+  font-size: 15px;
+}
+
+/* =========================
+   ZDJĘCIE PROFILOWE
+   ========================= */
+
+.avatar-editor {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.settings-avatar-large {
+  width: 112px;
+  height: 112px;
+
+  border: 4px solid var(--white);
+
+  box-shadow:
+    0 0 0 2px var(--line),
+    0 8px 20px rgba(28, 35, 33, 0.12);
+}
+
+.settings-avatar-large svg {
+  width: 54px;
+  height: 54px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.avatar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.avatar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-secondary-button,
+.settings-save-button,
+.settings-cancel-button,
+.settings-text-button {
+  font-family: inherit;
+
+  cursor: pointer;
+
+  text-decoration: none;
+}
+
+.settings-secondary-button svg,
+.settings-text-button svg {
+  width: 18px;
+  height: 18px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.settings-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  min-height: 44px;
+  padding: 0 20px;
+
+  border: 1px solid var(--teal);
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--teal-dark);
+
+  font-size: 15px;
+  font-weight: 700;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.settings-secondary-button:hover {
+  background: var(--teal-dark);
+  color: #ffffff;
+}
+
+.avatar-buttons input:focus-visible + .settings-secondary-button {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.settings-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  min-height: 44px;
+  padding: 0 14px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--berry);
+
+  font-size: 14.5px;
+  font-weight: 600;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.settings-text-button:hover {
+  background: #f6e3e0;
+}
+
+.settings-text-button:focus-visible,
+.settings-save-button:focus-visible,
+.settings-cancel-button:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.settings-help {
+  color: #6a7572;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================
+   FORMULARZ
+   ========================= */
+
+.settings-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.settings-field-full {
+  grid-column: 1 / -1;
+}
+
+.settings-field label {
+  margin-bottom: 8px;
+
+  color: var(--ink);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.settings-field input,
+.settings-field select {
+  width: 100%;
+  min-height: 50px;
+
+  padding: 0 16px;
+
+  border: 1px solid var(--line);
+  border-radius: 10px;
+
+  background: var(--paper);
+  color: var(--ink);
+
+  font: inherit;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.settings-field input:hover:not(:disabled),
+.settings-field select:hover {
+  border-color: #bdb59b;
+}
+
+.settings-field input:focus,
+.settings-field select:focus {
+  border-color: var(--teal);
+
+  background: var(--white);
+
+  box-shadow: 0 0 0 4px rgba(14, 92, 83, 0.12);
+}
+
+.settings-field input:disabled {
+  background: var(--paper-deep);
+  color: #6a7572;
+
+  cursor: not-allowed;
+}
+
+.settings-field .settings-help {
+  margin-top: 7px;
+}
+
+/* Telefon: wybór kraju + numer w jednym wierszu */
+
+.phone-group {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.phone-select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+
+  padding-right: 42px;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%234b5350' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+
+  cursor: pointer;
+}
+
+.phone-input-wrapper {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  border: 1px solid var(--line);
+  border-radius: 10px;
+
+  background: var(--paper);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.phone-input-wrapper:hover {
+  border-color: #bdb59b;
+}
+
+.phone-input-wrapper:focus-within {
+  border-color: var(--teal);
+
+  background: var(--white);
+
+  box-shadow: 0 0 0 4px rgba(14, 92, 83, 0.12);
+}
+
+.phone-country-code {
+  align-self: stretch;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 14px;
+
+  border-right: 1px solid var(--line);
+  border-radius: 10px 0 0 10px;
+
+  background: var(--paper-deep);
+  color: var(--teal-dark);
+
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.phone-input-wrapper input {
+  border: none;
+  border-radius: 0 10px 10px 0;
+
+  background: transparent;
+  box-shadow: none;
+}
+
+.phone-input-wrapper input:focus {
+  border: none;
+
+  background: transparent;
+  box-shadow: none;
+}
+
+/* =========================
+   KOMUNIKAT
+   ========================= */
+
+.settings-message {
+  margin-top: 26px;
+
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.settings-message:empty {
+  display: none;
+}
+
+.settings-message.is-error,
+.settings-message.is-success {
+  padding: 12px 16px;
+
+  border-radius: 10px;
+}
+
+.settings-message.is-error {
+  background: #f6e3e0;
+  color: #7d2a21;
+}
+
+.settings-message.is-success {
+  background: #e1efe3;
+  color: #245a31;
+}
+
+/* =========================
+   PRZYCISKI AKCJI
+   ========================= */
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 28px;
+  padding-top: 24px;
+
+  border-top: 1px solid var(--line);
+}
+
+.settings-cancel-button {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 48px;
+  padding: 0 20px;
+
+  border-radius: 10px;
+
+  color: var(--ink-soft);
+
+  font-weight: 600;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.settings-cancel-button:hover {
+  background: var(--paper-deep);
+  color: var(--ink);
+}
+
+.settings-save-button {
+  min-height: 48px;
+  padding: 0 28px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: var(--teal-dark);
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  box-shadow: 0 8px 18px rgba(9, 63, 56, 0.22);
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.settings-save-button:hover {
+  background: var(--teal);
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 12px 22px rgba(9, 63, 56, 0.26);
+}
+
+.settings-save-button:active {
+  transform: translateY(0);
+}
+
+.settings-save-button:disabled {
+  opacity: 0.6;
+
+  cursor: wait;
+
+  transform: none;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 700px) {
+  .settings-page {
+    padding: 24px 14px 64px;
+  }
+
+  .settings-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+
+    padding: 28px 24px;
+  }
+
+  .settings-heading-avatar {
+    width: 104px;
+    height: 104px;
+  }
+
+  .settings-hero h1 {
+    font-size: 32px;
+  }
+
+  .settings-hero p {
+    font-size: 15.5px;
+  }
+
+  .settings-card {
+    padding: 24px 20px;
+  }
+
+  .settings-card-header {
+    gap: 14px;
+  }
+
+  .settings-card h2 {
+    font-size: 22px;
+  }
+
+  .avatar-editor {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .settings-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-field-full {
+    grid-column: auto;
+  }
+
+  .phone-group {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .settings-cancel-button,
+  .settings-save-button {
+    width: 100%;
+
+    justify-content: center;
+
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-save-button,
+  .settings-secondary-button,
+  .settings-text-button {
+    transition: none;
+  }
+}
+
+.settings-secondary-button {
+  padding: 12px 20px;
+  border: 1px solid #093f38;
+  border-radius: 10px;
+  background: transparent;
+  color: #093f38;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-secondary-button:hover {
+  background: rgba(9, 63, 56, 0.08);
+}
+
+.settings-secondary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.payouts-embedded {
+  margin-top: 20px;
+}
+
+#payouts-embedded-container {
+  min-height: 200px;
+}

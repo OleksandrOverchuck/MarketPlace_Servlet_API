@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil użytkownika - JollyCart</title>
+    <script>
+      if (localStorage.getItem("loggedIn") === "1") {
+        document.documentElement.classList.add("logged-in");
+      }
+    </script>
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/profile.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="container nav-container">
+        <div class="logo">
+          <a href="index.html" class="logo-link">
+            <span class="logo-text">JollyCart</span>
+          </a>
+        </div>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="index.html">Strona główna</a></li>
+            <li>
+              <div id="auth-user">
+                <a href="login.html" class="auth-login-link">Logowanie</a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+        <button
+          class="menu-toggle"
+          onclick="toggleMenu()"
+          aria-label="Otwórz menu"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <main class="pf-page">
+      <div class="container pf-container">
+        <button type="button" class="pf-back" id="pf-back">← Wróć</button>
+
+        <div id="pf-message" class="pf-message" aria-live="polite"></div>
+
+        <section id="pf-card" class="pf-card" hidden>
+          <div class="pf-head">
+            <div id="pf-avatar" class="pf-avatar">?</div>
+
+            <div class="pf-head-info">
+              <h1 id="pf-name">Użytkownik</h1>
+              <p id="pf-meta" class="pf-meta"></p>
+
+              <div class="pf-summary">
+                <span id="pf-summary-stars" class="pf-stars pf-stars-static"></span>
+                <strong id="pf-average">0.0</strong>
+                <span id="pf-count" class="pf-count"></span>
+              </div>
+            </div>
+          </div>
+
+          <div id="pf-rate-box" class="pf-rate-box" hidden>
+            <h2>Oceń tego użytkownika</h2>
+            <div
+              id="pf-rate-stars"
+              class="pf-stars pf-stars-input"
+              role="radiogroup"
+              aria-label="Ocena od 1 do 5"
+            ></div>
+            <p id="pf-rate-hint" class="pf-rate-hint"></p>
+            <button type="button" id="pf-rate-remove" class="pf-rate-remove" hidden>
+              Usuń moją ocenę
+            </button>
+          </div>
+
+          <p id="pf-login-hint" class="pf-login-hint" hidden>
+            Aby ocenić użytkownika, <a href="login.html">zaloguj się</a>.
+          </p>
+        </section>
+
+        <section id="pf-offers-section" class="pf-offers-section" hidden>
+          <h2>Aktywne ogłoszenia</h2>
+          <div id="pf-offers" class="pf-offers"></div>
+        </section>
+      </div>
+    </main>
+
+    <script src="../scripts/animation/menuToggle.js"></script>
+    <script src="../scripts/auth/auth.js"></script>
+    <script src="../scripts/profile/profile.js"></script>
+  </body>
+</html>

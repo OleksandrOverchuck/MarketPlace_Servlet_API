@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rejestracja - JollyCart</title>
+    <link rel="stylesheet" href="../styles/style.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="container nav-container">
+        <div class="logo">
+          <a href="index.html" class="logo-link">
+            <svg
+              class="logo-icon"
+              width="45"
+              height="45"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M14 9 Q15 6 18 7"
+                stroke="#2f6b3a"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                fill="none"
+              />
+              <circle cx="16" cy="11" r="5.5" fill="#e2574c" />
+              <path d="M25 4 L29.5 14 L20.5 14 Z" fill="#e8a33d" />
+              <circle cx="32" cy="12" r="5" fill="#5b8c3e" />
+              <path
+                d="M6 14H10L14.5 33H35"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M13 19H37.5L34.5 31H16.5"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle cx="19" cy="39" r="3" fill="#0e5c53" />
+              <circle cx="31" cy="39" r="3" fill="#0e5c53" />
+            </svg>
+            <span class="logo-text">JollyCart</span>
+          </a>
+        </div>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="index.html">Strona główna</a></li>
+            <li><a href="login.html">Logowanie</a></li>
+            <li><a href="register.html">Rejestracja</a></li>
+          </ul>
+        </nav>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+      </div>
+    </header>
+
+    <main class="auth-page">
+      <div class="auth-container">
+        <div class="auth-box">
+          <h1>Rejestracja</h1>
+          <p>Utwórz konto i zacznij dodawać własne ogłoszenia.</p>
+
+          <button type="button" class="oauth-btn">
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+              <path
+                fill="#4285F4"
+                d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"
+              />
+              <path
+                fill="#34A853"
+                d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.9v2.33A9 9 0 0 0 9 18z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.9A9 9 0 0 0 0 9c0 1.45.35 2.83.9 4.03l3.05-2.33z"
+              />
+              <path
+                fill="#EA4335"
+                d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .9 4.97L3.95 7.3C4.66 5.17 6.65 3.58 9 3.58z"
+              />
+            </svg>
+            Kontynuuj przez Google
+          </button>
+
+          <div class="oauth-divider">lub</div>
+
+          <form class="auth-form" id="register-form">
+            <div class="form-group">
+              <label for="username">Nazwa użytkownika</label>
+              <input
+                type="text"
+                id="username"
+                placeholder="Wpisz nazwę użytkownika"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="Wpisz swój email"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Hasło</label>
+              <input
+                type="password"
+                id="password"
+                placeholder="Utwórz hasło"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Powtórz hasło</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Powtórz hasło"
+                required
+              />
+            </div>
+
+            <button type="submit" class="auth-btn">Zarejestruj się</button>
+          </form>
+
+          <!-- Krok 2: kod z maila (pokazywany po udanym kroku 1) -->
+          <form class="auth-form" id="verify-form" hidden>
+            <p class="verify-info">
+              Wysłaliśmy kod weryfikacyjny na adres
+              <strong id="verify-email-label"></strong>.
+              Wpisz go poniżej, aby dokończyć rejestrację.
+            </p>
+
+            <div class="form-group">
+              <label for="verificationCode">Kod weryfikacyjny</label>
+              <input
+                type="text"
+                id="verificationCode"
+                class="code-input"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="8"
+                placeholder="------"
+                required
+              />
+            </div>
+
+            <button type="submit" class="auth-btn">
+              Potwierdź i utwórz konto
+            </button>
+
+            <button type="button" class="auth-secondary-btn" id="resend-code-btn">
+              Wyślij kod ponownie
+            </button>
+
+            <button type="button" class="auth-secondary-btn" id="verify-back-btn">
+              Wróć i zmień dane
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            <p>Masz już konto? <a href="login.html">Zaloguj się</a></p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../scripts/animation/menuToggle.js"></script>
+    <script src="../scripts/animation/navScroll.js"></script>
+    <script src="../scripts/auth/auth.js"></script>
+  </body>
+</html>

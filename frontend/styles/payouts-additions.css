@@ -1,0 +1,29 @@
+/* Dopisz na końcu styles/settings.css */
+
+.settings-secondary-button {
+  padding: 12px 20px;
+  border: 1px solid #093f38;
+  border-radius: 10px;
+  background: transparent;
+  color: #093f38;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-secondary-button:hover {
+  background: rgba(9, 63, 56, 0.08);
+}
+
+.settings-secondary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.payouts-embedded {
+  margin-top: 20px;
+}
+
+#payouts-embedded-container {
+  min-height: 200px;
+}

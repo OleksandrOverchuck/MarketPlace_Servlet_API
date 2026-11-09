@@ -1,0 +1,248 @@
+/* =========================================================
+   WYBÓR LOKALIZACJI (Google Maps)
+   ========================================================= */
+
+.location-picker {
+  position: relative;
+
+  width: 100%;
+}
+
+.location-picker .location-picker-input {
+  display: block;
+
+  padding-right: 54px;
+}
+
+.location-picker-locate {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--teal);
+
+  cursor: pointer;
+
+  transform: translateY(-50%);
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.location-picker-locate:hover {
+  background: #dfeee9;
+  color: var(--teal-dark);
+}
+
+.location-picker-locate:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 1px;
+}
+
+.location-picker-locate:disabled {
+  cursor: progress;
+}
+
+.location-picker-locate svg {
+  width: 22px;
+  height: 22px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.location-picker-locate.is-loading svg {
+  animation: location-picker-spin 1s linear infinite;
+}
+
+@keyframes location-picker-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+   LISTA PODPOWIEDZI
+   ========================= */
+
+.location-picker-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+
+  z-index: 60;
+
+  max-height: 340px;
+  padding: 6px;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  box-shadow:
+    0 14px 32px rgba(28, 35, 33, 0.16),
+    0 2px 6px rgba(28, 35, 33, 0.06);
+}
+
+.location-picker-list[hidden] {
+  display: none;
+}
+
+.location-picker-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 12px;
+
+  border-radius: 8px;
+
+  color: var(--ink);
+
+  cursor: pointer;
+}
+
+.location-picker-option.is-active {
+  background: #eaf3ef;
+}
+
+.location-picker-option svg {
+  flex: 0 0 20px;
+
+  width: 20px;
+  height: 20px;
+
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.location-picker-text {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.location-picker-main {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.location-picker-secondary {
+  overflow: hidden;
+
+  color: var(--ink-soft);
+
+  font-size: 13px;
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.location-picker-option.is-locate .location-picker-main {
+  color: var(--teal-dark);
+}
+
+.location-picker-status {
+  padding: 12px;
+
+  color: var(--ink-soft);
+
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.location-picker-attribution {
+  padding: 6px 12px 2px;
+
+  color: #6a7572;
+
+  font-size: 11px;
+  text-align: right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .location-picker-locate.is-loading svg {
+    animation-duration: 3s;
+  }
+}
+
+/* =========================
+   MAPA WYBORU LOKALIZACJI
+   ========================= */
+
+.location-map {
+  margin-top: 10px;
+}
+
+.location-map[hidden] {
+  display: none;
+}
+
+.location-map-stage {
+  width: 100%;
+  height: 320px;
+
+  overflow: hidden;
+
+  background: #eaf3ef;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.location-map.is-loading .location-map-stage {
+  cursor: progress;
+}
+
+.location-map-status {
+  margin-top: 8px;
+
+  color: var(--ink-soft);
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .location-map-stage {
+    height: 240px;
+  }
+}
+
+.location-map-status.is-error {
+  padding: 8px 10px;
+
+  border-radius: 8px;
+
+  background: #fdecea;
+  color: #8a1f14;
+
+  font-weight: 600;
+}

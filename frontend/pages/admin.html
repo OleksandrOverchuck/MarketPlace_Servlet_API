@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel zarządzania - JollyCart</title>
+
+    <script>
+      if (localStorage.getItem("loggedIn") === "1") {
+        document.documentElement.classList.add("logged-in");
+      }
+    </script>
+
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/admin.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+      <div class="container nav-container">
+        <div class="logo">
+          <a href="index.html" class="logo-link">
+            <svg
+              class="logo-icon"
+              width="45"
+              height="45"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M14 9 Q15 6 18 7"
+                stroke="#2f6b3a"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                fill="none"
+              />
+              <circle cx="16" cy="11" r="5.5" fill="#e2574c" />
+              <path d="M25 4 L29.5 14 L20.5 14 Z" fill="#e8a33d" />
+              <circle cx="32" cy="12" r="5" fill="#5b8c3e" />
+              <path
+                d="M6 14H10L14.5 33H35"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M13 19H37.5L34.5 31H16.5"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle cx="19" cy="39" r="3" fill="#0e5c53" />
+              <circle cx="31" cy="39" r="3" fill="#0e5c53" />
+            </svg>
+
+            <span class="logo-text">JollyCart</span>
+          </a>
+        </div>
+
+        <nav>
+          <ul class="nav-links">
+            <li>
+              <a href="index.html">Strona główna</a>
+            </li>
+
+            <li>
+              <div id="auth-user">
+                <a href="login.html" class="auth-login-link"> Logowanie </a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+
+        <button
+          class="menu-toggle"
+          onclick="toggleMenu()"
+          aria-label="Otwórz menu"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <main class="panel-page">
+      <div class="panel-container">
+        <header class="panel-hero">
+          <span class="panel-badge" id="panel-role-badge">…</span>
+          <h1 id="panel-title">Panel zarządzania</h1>
+          <p id="panel-subtitle">Ładowanie…</p>
+        </header>
+
+        <div id="panel-message" class="panel-message" hidden></div>
+
+        <div class="panel-tabs" role="tablist">
+          <button type="button" class="panel-tab active" data-tab="users">
+            Użytkownicy
+          </button>
+          <button type="button" class="panel-tab" data-tab="offers">
+            Ogłoszenia
+          </button>
+          <button type="button" class="panel-tab" data-tab="disputes">
+            Zgłoszenia
+            <span class="panel-tab-badge" id="disputes-badge" hidden>0</span>
+          </button>
+          <button
+            type="button"
+            class="panel-tab"
+            data-tab="audit"
+            data-admin-only
+            hidden
+          >
+            Dziennik zdarzeń
+          </button>
+          <button type="button" class="panel-tab" data-tab="password">
+            Moje hasło
+          </button>
+        </div>
+
+        <!-- UŻYTKOWNICY -->
+        <section class="panel-card" id="tab-users">
+          <div class="panel-filters">
+            <input
+              type="search"
+              id="users-q"
+              placeholder="Szukaj po ID, nicku lub e-mailu…"
+              autocomplete="off"
+            />
+
+            <select id="users-role">
+              <option value="">Wszystkie role</option>
+              <option value="USER">Użytkownik</option>
+              <option value="MODERATOR">Moderator</option>
+              <option value="ADMIN">Administrator</option>
+            </select>
+
+            <select id="users-status">
+              <option value="">Każdy status</option>
+              <option value="ACTIVE">Aktywne</option>
+              <option value="BANNED">Zablokowane</option>
+            </select>
+          </div>
+
+          <div class="panel-table-wrap">
+            <table class="panel-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nick</th>
+                  <th>E-mail</th>
+                  <th>Rola</th>
+                  <th>Status</th>
+                  <th>Ogł.</th>
+                  <th>Akcje</th>
+                </tr>
+              </thead>
+              <tbody id="users-body"></tbody>
+            </table>
+          </div>
+
+          <div class="panel-pager" id="users-pager"></div>
+        </section>
+
+        <!-- OGŁOSZENIA -->
+        <section class="panel-card" id="tab-offers" hidden>
+          <div class="panel-filters">
+            <input
+              type="search"
+              id="offers-q"
+              placeholder="Szukaj po ID lub tytule ogłoszenia…"
+              autocomplete="off"
+            />
+
+            <input
+              type="number"
+              id="offers-user"
+              min="1"
+              placeholder="ID autora"
+            />
+
+            <select id="offers-status">
+              <option value="">Każdy status</option>
+              <option value="ACTIVE">Aktywne</option>
+              <option value="INACTIVE">Nieaktywne</option>
+              <option value="SOLD">Sprzedane</option>
+            </select>
+          </div>
+
+          <div class="panel-table-wrap">
+            <table class="panel-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tytuł</th>
+                  <th>Status</th>
+                  <th>Cena</th>
+                  <th>Autor</th>
+                  <th>Dodano</th>
+                  <th>Akcje</th>
+                </tr>
+              </thead>
+              <tbody id="offers-body"></tbody>
+            </table>
+          </div>
+
+          <div class="panel-pager" id="offers-pager"></div>
+        </section>
+
+        <!-- ZGŁOSZENIA PROBLEMÓW Z ZAMÓWIENIAMI -->
+        <section class="panel-card" id="tab-disputes" hidden>
+          <div id="disputes-overview">
+            <div class="dispute-subtabs" role="tablist">
+              <button
+                type="button"
+                class="dispute-subtab active"
+                data-dispute-status="OPEN"
+              >
+                Aktualne
+              </button>
+              <button
+                type="button"
+                class="dispute-subtab"
+                data-dispute-status="RESOLVED"
+              >
+                Rozwiązane
+              </button>
+            </div>
+
+            <div id="disputes-list" class="dispute-list"></div>
+          </div>
+
+          <div id="dispute-detail" class="dispute-detail" hidden></div>
+        </section>
+
+        <!-- DZIENNIK -->
+        <section class="panel-card" id="tab-audit" hidden>
+          <div class="panel-table-wrap">
+            <table class="panel-table">
+              <thead>
+                <tr>
+                  <th>Czas</th>
+                  <th>Kto</th>
+                  <th>Akcja</th>
+                  <th>Cel</th>
+                  <th>Szczegóły</th>
+                </tr>
+              </thead>
+              <tbody id="audit-body"></tbody>
+            </table>
+          </div>
+
+          <div class="panel-pager" id="audit-pager"></div>
+        </section>
+
+        <!-- HASŁO -->
+        <section class="panel-card" id="tab-password" hidden>
+          <h2>Zmiana hasła</h2>
+
+          <p id="password-info" class="panel-muted"></p>
+
+          <form id="password-form" class="panel-form">
+            <label>
+              Obecne hasło
+              <input
+                type="password"
+                id="pw-current"
+                autocomplete="current-password"
+                required
+              />
+            </label>
+
+            <label>
+              Nowe hasło (min. 8 znaków)
+              <input
+                type="password"
+                id="pw-new"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              />
+            </label>
+
+            <label>
+              Powtórz nowe hasło
+              <input
+                type="password"
+                id="pw-confirm"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              />
+            </label>
+
+            <button type="submit" class="btn primary">Zmień hasło</button>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <script src="../scripts/animation/menuToggle.js"></script>
+    <script src="../scripts/auth/auth.js"></script>
+    <script src="../scripts/admin/admin.js"></script>
+  </body>
+</html>

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edytuj ogłoszenie - JollyCart</title>
+    <script>
+      if (localStorage.getItem("loggedIn") === "1") {
+        document.documentElement.classList.add("logged-in");
+      }
+    </script>
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/post-ad.css" />
+    <link rel="stylesheet" href="../styles/edit-offer.css" />
+    <link rel="stylesheet" href="../styles/location-picker.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="container nav-container">
+        <div class="logo">
+          <a href="index.html" class="logo-link">
+            <svg
+              class="logo-icon"
+              width="45"
+              height="45"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M14 9 Q15 6 18 7"
+                stroke="#2f6b3a"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                fill="none"
+              />
+              <circle cx="16" cy="11" r="5.5" fill="#e2574c" />
+              <path d="M25 4 L29.5 14 L20.5 14 Z" fill="#e8a33d" />
+              <circle cx="32" cy="12" r="5" fill="#5b8c3e" />
+              <path
+                d="M6 14H10L14.5 33H35"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M13 19H37.5L34.5 31H16.5"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle cx="19" cy="39" r="3" fill="#0e5c53" />
+              <circle cx="31" cy="39" r="3" fill="#0e5c53" />
+            </svg>
+            <span class="logo-text">JollyCart</span>
+          </a>
+        </div>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="index.html">Strona główna</a></li>
+            <li>
+              <div id="auth-user">
+                <a href="login.html" class="auth-login-link">Logowanie</a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+        <button
+          class="menu-toggle"
+          onclick="toggleMenu()"
+          aria-label="Otwórz menu"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <main class="post-ad-page">
+      <div class="post-ad-container">
+        <div class="post-ad-heading">
+          <span class="post-ad-badge">TWOJE OGŁOSZENIE</span>
+          <h1>Edytuj ogłoszenie</h1>
+          <p>Zmień informacje w swoim ogłoszeniu i zapisz zmiany.</p>
+        </div>
+
+        <form id="edit-offer-form" class="post-ad-form">
+          <section class="post-ad-card">
+            <div class="post-ad-card-header">
+              <span class="post-ad-eyebrow">SZCZEGÓŁY OGŁOSZENIA</span>
+              <h2>Aktualizuj ogłoszenie</h2>
+            </div>
+
+            <div class="post-ad-fields">
+              <div class="post-ad-field post-ad-field-full">
+                <label for="title">Tytuł ogłoszenia <span>*</span></label>
+                <input id="title" type="text" maxlength="150" required />
+                <div class="post-ad-counter">
+                  <span>Podaj krótki i konkretny tytuł.</span
+                  ><span id="title-counter">0/150</span>
+                </div>
+              </div>
+
+              <div class="post-ad-field">
+                <label for="type">Typ ogłoszenia <span>*</span></label>
+                <select id="type" required>
+                  <option value="SALE">Sprzedaż</option>
+                  <option value="SERVICE">Usługa</option>
+                  <option value="JOB">Oferta pracy</option>
+                </select>
+              </div>
+
+              <div class="post-ad-field">
+                <label for="category">Kategoria <span>*</span></label>
+                <select id="category" required>
+                  <option value="" disabled>Ładowanie kategorii...</option>
+                </select>
+              </div>
+
+              <div class="post-ad-field">
+                <label for="location">Lokalizacja</label>
+                <input
+                  id="location"
+                  data-location-picker
+                  type="text"
+                  maxlength="150"
+                  placeholder="Np. Opole"
+                />
+                <span class="post-ad-help"
+                  >Miasto lub dokładniejsza lokalizacja.</span
+                >
+              </div>
+
+              <div class="post-ad-field">
+                <label for="image">Dodaj zdjęcia</label>
+                <input
+                  id="image"
+                  type="file"
+                  accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+                  multiple
+                />
+                <span class="post-ad-help"
+                  >Opcjonalne. Możesz wybrać kilka zdjęć naraz. PNG lub JPG,
+                  maksymalnie 10 MB każde.</span
+                >
+              </div>
+
+              <div class="post-ad-field">
+                <label for="status">Status <span>*</span></label>
+                <select id="status" required>
+                  <option value="ACTIVE">Aktywne</option>
+                  <option value="INACTIVE">Nieaktywne</option>
+                  <option value="SOLD">Sprzedane</option>
+                  <option value="RESERVED" disabled>
+                    Zarezerwowane (trwa płatność)
+                  </option>
+                </select>
+              </div>
+
+              <div class="post-ad-field post-ad-price-field">
+                <label for="price">Cena / wynagrodzenie</label>
+                <div class="post-ad-price-input">
+                  <input
+                    id="price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Np. 1200"
+                  />
+                  <span>zł</span>
+                </div>
+              </div>
+
+              <div class="post-ad-field post-ad-field-full" id="online-payment-field" hidden>
+                <label
+                  for="online-payment"
+                  style="display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer;"
+                >
+                  <input
+                    type="checkbox"
+                    id="online-payment"
+                    style="width: 18px; height: 18px;"
+                  />
+                  <span>Przyjmuj płatności przez JollyCart</span>
+                </label>
+                <span class="post-ad-help" id="online-payment-help"></span>
+
+                <div id="shipping-cost-box" hidden style="margin-top: 12px;">
+                  <label for="shipping-cost" style="font-weight: 600;">Koszt dostawy</label>
+                  <div class="post-ad-price-input">
+                    <input
+                      id="shipping-cost"
+                      type="number"
+                      min="0"
+                      max="10000"
+                      step="0.01"
+                      placeholder="0"
+                    />
+                    <span>zł</span>
+                  </div>
+                </div>
+                <span class="post-ad-help" id="shipping-cost-help" hidden>
+                  Opcjonalnie (domyślnie 0 zł). Cały koszt dostawy trafia do Ciebie.
+                </span>
+              </div>
+
+              <div
+                class="post-ad-field post-ad-field-full"
+                id="existing-images-field"
+                hidden
+              >
+                <label>Obecne zdjęcia</label>
+                <div id="existing-images" class="existing-offer-images"></div>
+              </div>
+
+              <div class="post-ad-field post-ad-field-full">
+                <label for="description">Opis ogłoszenia <span>*</span></label>
+                <textarea
+                  id="description"
+                  maxlength="5000"
+                  rows="8"
+                  required
+                ></textarea>
+                <div class="post-ad-counter">
+                  <span>Maksymalnie 5000 znaków.</span
+                  ><span id="description-counter">0/5000</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div
+            id="edit-offer-message"
+            class="post-ad-message"
+            aria-live="polite"
+          ></div>
+
+          <div class="post-ad-actions">
+            <a href="my-offers.html" class="post-ad-cancel">Anuluj</a>
+            <button type="submit" class="post-ad-submit" id="edit-offer-submit">
+              Zapisz zmiany
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <script src="../scripts/animation/menuToggle.js"></script>
+    <script src="../scripts/location/maps-config.js"></script>
+    <script src="../scripts/location/location-picker.js"></script>
+    <script src="../scripts/auth/auth.js"></script>
+    <script src="../scripts/payments/offer-form-payment.js"></script>
+    <script src="../scripts/offers/edit-offer.js"></script>
+  </body>
+</html>

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Zamówienia - JollyCart</title>
+
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/payments.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+      <div class="container nav-container">
+        <div class="logo">
+          <a href="index.html" class="logo-link">
+            <svg
+              class="logo-icon"
+              width="45"
+              height="45"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M14 9 Q15 6 18 7"
+                stroke="#2f6b3a"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                fill="none"
+              />
+
+              <circle cx="16" cy="11" r="5.5" fill="#e2574c" />
+
+              <path d="M25 4 L29.5 14 L20.5 14 Z" fill="#e8a33d" />
+
+              <circle cx="32" cy="12" r="5" fill="#5b8c3e" />
+
+              <path
+                d="M6 14H10L14.5 33H35"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+              <path
+                d="M13 19H37.5L34.5 31H16.5"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+              <circle cx="19" cy="39" r="3" fill="#0e5c53" />
+
+              <circle cx="31" cy="39" r="3" fill="#0e5c53" />
+            </svg>
+
+            <span class="logo-text"> JollyCart </span>
+          </a>
+        </div>
+
+        <nav>
+          <ul class="nav-links">
+            <li>
+              <a href="index.html"> Strona główna </a>
+            </li>
+
+            <li>
+              <div id="auth-user">
+                <a href="login.html" class="auth-login-link"> Logowanie </a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+
+        <button
+          class="menu-toggle"
+          onclick="toggleMenu()"
+          aria-label="Otwórz menu"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <main class="orders-page">
+      <div class="container">
+        <h1>Zamówienia</h1>
+        <p class="orders-lead">
+          Zakupy i sprzedaż zrealizowane przez JollyCart. Pieniądze trafiają do
+          sprzedawcy dopiero po potwierdzeniu odbioru towaru.
+        </p>
+
+        <div class="orders-tabs" role="tablist">
+          <button type="button" class="is-active" data-orders-tab="purchases">
+            Moje zakupy
+          </button>
+          <button type="button" data-orders-tab="sales">Moja sprzedaż</button>
+        </div>
+
+        <div
+          id="orders-banner"
+          class="orders-banner"
+          role="status"
+          hidden
+        ></div>
+
+        <div id="orders-list">
+          <p class="orders-empty">Ładowanie zamówień...</p>
+        </div>
+      </div>
+    </main>
+
+    <script src="../scripts/animation/menuToggle.js"></script>
+    <script src="../scripts/auth/auth.js"></script>
+    <script src="../scripts/payments/orders.js"></script>
+  </body>
+</html>

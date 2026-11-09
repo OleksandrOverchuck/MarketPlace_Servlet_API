@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Wiadomości - JollyCart</title>
+
+    <link rel="stylesheet" href="../styles/chat.css" />
+  </head>
+
+  <body>
+    <div class="chat-page" id="chat-page">
+      <!-- Nakładka widoczna podczas przeciągania pliku nad czat -->
+      <div id="drop-overlay" class="drop-overlay" hidden>
+        <div class="drop-overlay-box">
+          Upuść plik, aby go załączyć
+          <span>PDF, obrazy, dokumenty Office, TXT, CSV · max 5 MB</span>
+        </div>
+      </div>
+
+      <!-- =========================
+         NAGŁÓWEK CZATU
+         ========================= -->
+
+      <header class="chat-header">
+        <button
+          id="back-button"
+          class="back-button"
+          type="button"
+          aria-label="Wróć"
+        >
+          ←
+        </button>
+
+        <div class="chat-user" id="chat-user" title="Zobacz profil użytkownika">
+          <div id="chat-user-avatar" class="chat-avatar">?</div>
+
+          <div class="chat-user-info">
+            <div id="chat-user-name" class="chat-user-name">Rozmowa</div>
+
+            <div id="chat-user-status" class="chat-user-status">Wiadomości</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- =========================
+         WIADOMOŚCI
+         ========================= -->
+
+      <main id="messages-container" class="messages-container"></main>
+
+      <!-- =========================
+         WYSYŁANIE WIADOMOŚCI
+         ========================= -->
+
+      <form id="message-form" class="message-form">
+        <!-- Podgląd wybranego pliku przed wysłaniem -->
+        <div id="attachment-preview" class="attachment-preview" hidden>
+          <span class="attachment-preview-icon" aria-hidden="true">📎</span>
+
+          <span
+            id="attachment-preview-name"
+            class="attachment-preview-name"
+          ></span>
+
+          <span
+            id="attachment-preview-size"
+            class="attachment-preview-size"
+          ></span>
+
+          <button
+            id="attachment-remove-button"
+            class="attachment-remove"
+            type="button"
+            aria-label="Usuń załącznik"
+          >
+            ×
+          </button>
+        </div>
+
+        <input
+          id="attachment-input"
+          type="file"
+          hidden
+          accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+        />
+
+        <button
+          id="attach-file-button"
+          class="attach-button"
+          type="button"
+          aria-label="Załącz plik"
+          title="Załącz plik (max 5 MB)"
+        >
+          📎
+        </button>
+
+        <input
+          id="message-input"
+          type="text"
+          placeholder="Napisz wiadomość..."
+          autocomplete="off"
+          maxlength="5000"
+        />
+
+        <button id="send-message-button" type="submit">Wyślij</button>
+      </form>
+    </div>
+
+    <!-- AUTH -->
+    <script src="../scripts/auth/auth.js"></script>
+    <script src="../scripts/profile/profile-links.js"></script>
+
+    <!-- CHAT -->
+    <script src="../scripts/chat/chat.js"></script>
+  </body>
+</html>

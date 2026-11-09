@@ -1,0 +1,20 @@
+#edit-offer-message.is-success {
+  color: var(--teal-dark);
+  background: #dff1ed;
+  border: 1px solid #b9ddd6;
+}
+
+#edit-offer-message.is-error {
+  color: #8b2f27;
+  background: #f7ded9;
+  border: 1px solid #e8bbb4;
+}
+
+.post-ad-message {
+  border-radius: 8px;
+}
+
+.existing-offer-images { display:flex; flex-wrap:wrap; gap:14px; }
+.existing-offer-image { width:160px; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--paper-deep); }
+.existing-offer-image img { display:block; width:100%; height:120px; object-fit:cover; }
+.existing-offer-image-delete { width:100%; border:0; padding:10px; background:transparent; color:var(--berry); font-weight:700; cursor:pointer; }

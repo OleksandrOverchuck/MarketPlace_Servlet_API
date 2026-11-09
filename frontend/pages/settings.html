@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ustawienia profilu - JollyCart</title>
+
+    <script>
+      if (localStorage.getItem("loggedIn") === "1") {
+        document.documentElement.classList.add("logged-in");
+      }
+    </script>
+
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/settings.css" />
+    <link rel="stylesheet" href="../styles/own-rating.css" />
+    <link rel="stylesheet" href="../styles/location-picker.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+      <div class="container nav-container">
+        <div class="logo">
+          <a href="index.html" class="logo-link">
+            <svg
+              class="logo-icon"
+              width="45"
+              height="45"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M14 9 Q15 6 18 7"
+                stroke="#2f6b3a"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                fill="none"
+              />
+              <circle cx="16" cy="11" r="5.5" fill="#e2574c" />
+              <path d="M25 4 L29.5 14 L20.5 14 Z" fill="#e8a33d" />
+              <circle cx="32" cy="12" r="5" fill="#5b8c3e" />
+
+              <path
+                d="M6 14H10L14.5 33H35"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+              <path
+                d="M13 19H37.5L34.5 31H16.5"
+                stroke="#0e5c53"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+              <circle cx="19" cy="39" r="3" fill="#0e5c53" />
+              <circle cx="31" cy="39" r="3" fill="#0e5c53" />
+            </svg>
+
+            <span class="logo-text">JollyCart</span>
+          </a>
+        </div>
+
+        <nav>
+          <ul class="nav-links">
+            <li>
+              <a href="index.html">Strona główna</a>
+            </li>
+
+            <li>
+              <div id="auth-user">
+                <a href="login.html" class="auth-login-link"> Logowanie </a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+
+        <button
+          class="menu-toggle"
+          onclick="toggleMenu()"
+          aria-label="Otwórz menu"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <main class="settings-page">
+      <div class="settings-container">
+        <!-- =========================
+             BANER PROFILU
+             ========================= -->
+
+        <header class="settings-hero">
+          <div class="settings-hero-avatar-col">
+            <div class="settings-hero-avatar-wrap">
+              <div class="settings-heading-avatar" id="settings-avatar-preview">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 21c0-4.2 3.4-7 8-7s8 2.8 8 7"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="own-rating own-rating-hero" data-own-rating></div>
+          </div>
+
+          <div class="settings-hero-text">
+            <h1>Edytuj swój profil</h1>
+
+            <p>Zmień informacje, które są powiązane z Twoim kontem.</p>
+          </div>
+        </header>
+
+        <!-- =========================
+             ZDJĘCIE PROFILOWE
+             ========================= -->
+
+        <section class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"
+                ></path>
+                <circle cx="12" cy="13" r="3.5"></circle>
+              </svg>
+            </span>
+
+            <div>
+              <span class="settings-eyebrow">Zdjęcie profilowe</span>
+
+              <h2>Twoje zdjęcie</h2>
+
+              <p>Dodaj zdjęcie, które będzie widoczne przy Twoim koncie.</p>
+            </div>
+          </div>
+
+          <div class="avatar-editor">
+            <div class="avatar-rating-col">
+              <div class="settings-avatar-large" id="avatar-large-preview">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 21c0-4.2 3.4-7 8-7s8 2.8 8 7"></path>
+                </svg>
+              </div>
+
+              <div class="own-rating" data-own-rating></div>
+            </div>
+
+            <div class="avatar-actions">
+              <div class="avatar-buttons">
+                <input
+                  id="avatar-input"
+                  class="visually-hidden"
+                  type="file"
+                  accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+                />
+
+                <label class="settings-secondary-button" for="avatar-input">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 16V5M7.5 9.5L12 5l4.5 4.5M5 19h14"></path>
+                  </svg>
+                  Zmień zdjęcie
+                </label>
+
+                <button
+                  type="button"
+                  class="settings-text-button"
+                  id="remove-avatar-button"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10.5 11v5M13.5 11v5"
+                    ></path>
+                  </svg>
+                  Usuń zdjęcie
+                </button>
+              </div>
+
+              <span class="settings-help">JPG, PNG. Maksymalnie 5 MB.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-card" id="payouts">
+          <div class="settings-card-header">
+            <div>
+              <span class="settings-eyebrow">Płatności</span>
+
+              <h2>Konto bankowe do wypłat</h2>
+
+              <p>
+                Dodaj konto, aby w ogłoszeniach sprzedaży włączyć płatność przez
+                JollyCart. Dane podajesz bezpośrednio operatorowi płatności
+                (Stripe), JollyCart nie zapisuje numeru Twojego konta. Możesz to
+                zrobić tutaj, w aplikacji, albo na stronie Stripe.
+              </p>
+            </div>
+          </div>
+
+          <p id="payouts-status" class="settings-help">
+            Sprawdzanie statusu...
+          </p>
+
+          <div
+            id="payouts-message"
+            class="settings-message"
+            aria-live="polite"
+          ></div>
+
+          <div class="settings-actions">
+            <button
+              type="button"
+              class="settings-save-button"
+              id="payouts-embedded-button"
+              hidden
+            >
+              Dodaj konto w aplikacji
+            </button>
+
+            <button
+              type="button"
+              class="settings-secondary-button"
+              id="payouts-redirect-button"
+              hidden
+            >
+              Dodaj konto przez Stripe
+            </button>
+          </div>
+
+          <!-- Formularz Stripe osadzony w aplikacji -->
+          <div id="payouts-embedded" class="payouts-embedded" hidden>
+            <div id="payouts-embedded-container"></div>
+
+            <div class="settings-actions">
+              <button
+                type="button"
+                class="settings-secondary-button"
+                id="payouts-embedded-close"
+              >
+                Zamknij
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================
+             PODSTAWOWE INFORMACJE
+             ========================= -->
+
+        <section class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4 21c0-4.2 3.4-7 8-7s8 2.8 8 7"></path>
+              </svg>
+            </span>
+
+            <div>
+              <span class="settings-eyebrow">Podstawowe informacje</span>
+
+              <h2>Informacje o Tobie</h2>
+
+              <p>Te dane widzą inni użytkownicy przy Twoich ogłoszeniach.</p>
+            </div>
+          </div>
+
+          <form id="profile-settings-form" class="settings-form">
+            <div class="settings-form-grid">
+              <div class="settings-field">
+                <label for="nickname">Nazwa użytkownika</label>
+
+                <input
+                  id="nickname"
+                  name="nickname"
+                  type="text"
+                  maxlength="30"
+                  required
+                />
+              </div>
+
+              <div class="settings-field">
+                <label for="location">Lokalizacja</label>
+
+                <input
+                  id="location"
+                  name="location"
+                  data-location-picker
+                  type="text"
+                  maxlength="100"
+                  placeholder="np. Warszawa"
+                />
+              </div>
+
+              <div class="settings-field settings-field-full">
+                <label for="email">Email</label>
+
+                <input id="email" name="email" type="email" disabled />
+
+                <span class="settings-help">
+                  Email jest używany do logowania i nie można go tutaj zmienić.
+                </span>
+              </div>
+
+              <div class="settings-field settings-field-full">
+                <label for="phone">Numer telefonu</label>
+
+                <div class="phone-group">
+                  <div class="phone-select-wrapper">
+                    <select
+                      id="phone-country"
+                      name="phone-country"
+                      aria-label="Kraj"
+                    >
+                      <option
+                        value="PL"
+                        data-code="+48"
+                        data-min="9"
+                        data-max="9"
+                      >
+                        Polska (+48)
+                      </option>
+
+                      <option
+                        value="UA"
+                        data-code="+380"
+                        data-min="9"
+                        data-max="9"
+                      >
+                        Ukraina (+380)
+                      </option>
+
+                      <option
+                        value="DE"
+                        data-code="+49"
+                        data-min="10"
+                        data-max="11"
+                      >
+                        Niemcy (+49)
+                      </option>
+
+                      <option
+                        value="GB"
+                        data-code="+44"
+                        data-min="10"
+                        data-max="10"
+                      >
+                        Wielka Brytania (+44)
+                      </option>
+
+                      <option
+                        value="FR"
+                        data-code="+33"
+                        data-min="9"
+                        data-max="9"
+                      >
+                        Francja (+33)
+                      </option>
+
+                      <option
+                        value="CZ"
+                        data-code="+420"
+                        data-min="9"
+                        data-max="9"
+                      >
+                        Czechy (+420)
+                      </option>
+
+                      <option
+                        value="SK"
+                        data-code="+421"
+                        data-min="9"
+                        data-max="9"
+                      >
+                        Słowacja (+421)
+                      </option>
+
+                      <option
+                        value="AT"
+                        data-code="+43"
+                        data-min="10"
+                        data-max="13"
+                      >
+                        Austria (+43)
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="phone-input-wrapper">
+                    <span id="phone-country-code" class="phone-country-code"
+                      >+48</span
+                    >
+
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      inputmode="numeric"
+                      autocomplete="tel-national"
+                      placeholder="np. 123456789"
+                    />
+                  </div>
+                </div>
+
+                <span id="phone-help" class="settings-help">
+                  Polska: wpisz dokładnie 9 cyfr.
+                </span>
+              </div>
+            </div>
+
+            <div
+              id="settings-message"
+              class="settings-message"
+              aria-live="polite"
+            ></div>
+
+            <div class="settings-actions">
+              <a href="index.html" class="settings-cancel-button">Anuluj</a>
+
+              <button
+                type="submit"
+                class="settings-save-button"
+                id="save-profile-button"
+              >
+                Zapisz zmiany
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <script src="../scripts/animation/menuToggle.js"></script>
+    <script src="../scripts/location/maps-config.js"></script>
+    <script src="../scripts/location/location-picker.js"></script>
+    <script src="../scripts/auth/auth.js"></script>
+    <script src="../scripts/settings/settings.js"></script>
+    <script src="../scripts/settings/own-rating.js"></script>
+    <script src="../scripts/settings/payouts.js"></script>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+/* Oceny pod avatarem na stronie własnego profilu */
+
+.settings-hero-avatar-col,
+.avatar-rating-col {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.own-rating:empty {
+  display: none;
+}
+
+.own-rating-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.own-rating-link:hover .own-rating-text {
+  text-decoration: underline;
+}
+
+.own-stars {
+  display: inline-flex;
+  gap: 1px;
+}
+
+.own-star {
+  font-size: 20px;
+  line-height: 1;
+  background: linear-gradient(
+    90deg,
+    var(--amber) var(--fill, 0%),
+    var(--line) var(--fill, 0%)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.own-rating-hero .own-rating-link {
+  color: var(--white);
+}
+
+.own-rating-hero .own-star {
+  background: linear-gradient(
+    90deg,
+    var(--amber) var(--fill, 0%),
+    rgba(255, 253, 247, 0.35) var(--fill, 0%)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+@media (max-width: 640px) {
+  .avatar-rating-col {
+    align-items: flex-start;
+  }
+}
