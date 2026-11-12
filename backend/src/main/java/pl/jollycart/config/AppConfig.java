@@ -22,7 +22,10 @@ public record AppConfig(
         Set<String> corsAllowedOrigins,
         String frontendUrl,
         String googleClientId,
-        String googleClientSecret
+        String googleClientSecret,
+        String adminEmail,
+        String adminNickname,
+        String adminPassword
 ) {
 
     public static AppConfig load() {
@@ -45,7 +48,10 @@ public record AppConfig(
                 env("APP_FRONTEND_URL", "http://localhost:5501"),
                 env("GOOGLE_CLIENT_ID",
                         "529987822035-r69u35gj9m6lfdokqc0f4tkoe8uc87cq.apps.googleusercontent.com"),
-                env("GOOGLE_CLIENT_SECRET", "")
+                env("GOOGLE_CLIENT_SECRET", ""),
+                env("ADMIN_EMAIL", "admin@jollycart.local"),
+                env("ADMIN_NICKNAME", "admin"),
+                env("ADMIN_PASSWORD", "")
         );
     }
 

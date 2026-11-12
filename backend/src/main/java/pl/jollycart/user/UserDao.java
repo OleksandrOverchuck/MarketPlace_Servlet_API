@@ -92,4 +92,26 @@ public final class UserDao {
                 providerId, avatarUrl, LocalDateTime.now(), userId
         );
     }
+
+    public boolean existsByRole(Role role) {
+        return Db.exists("SELECT 1 FROM users WHERE role = ? LIMIT 1", role);
+    }
+
+    public void changeRole(long userId, Role role) {
+        Db.update("UPDATE users SET role = ?, updated_at = ? WHERE id = ?",
+                role, LocalDateTime.now(), userId);
+    }
+
+    /** Tworzy konto administratora z haslem lokalnym. Zwraca id nowego uzytkownika. */
+    public long createAdmin(String nickname, String email, String passwordHash,
+                            boolean passwordChangeRequired) {
+        LocalDateTime now = LocalDateTime.now();
+
+        return Db.insert(
+                "INSERT INTO users (nickname, email, password_hash, auth_provider, role, status, "
+                        + "password_change_required, created_at, updated_at) "
+                        + "VALUES (?, ?, ?, 'LOCAL', 'ADMIN', 'ACTIVE', ?, ?, ?)",
+                nickname, email, passwordHash, passwordChangeRequired, now, now
+        );
+    }
 }
