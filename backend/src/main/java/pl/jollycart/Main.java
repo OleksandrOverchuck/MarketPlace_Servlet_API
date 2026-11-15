@@ -21,12 +21,16 @@ import pl.jollycart.category.CategoryHandlers;
 import pl.jollycart.category.CategoryService;
 import pl.jollycart.config.AppConfig;
 import pl.jollycart.file.ChatAttachmentValidator;
+import pl.jollycart.file.CvFileService;
 import pl.jollycart.file.FileService;
 import pl.jollycart.file.ImageFileValidator;
 import pl.jollycart.file.StoredFileDao;
 import pl.jollycart.image.OfferImageDao;
 import pl.jollycart.image.OfferImageHandlers;
 import pl.jollycart.image.OfferImageService;
+import pl.jollycart.job.JobApplicationDao;
+import pl.jollycart.job.JobApplicationHandlers;
+import pl.jollycart.job.JobApplicationService;
 import pl.jollycart.message.ConversationDao;
 import pl.jollycart.message.ConversationHandlers;
 import pl.jollycart.message.ConversationService;
@@ -41,6 +45,9 @@ import pl.jollycart.offer.OfferDao;
 import pl.jollycart.offer.OfferHandlers;
 import pl.jollycart.offer.OfferService;
 import pl.jollycart.db.Db;
+import pl.jollycart.rating.UserProfileHandlers;
+import pl.jollycart.rating.UserRatingDao;
+import pl.jollycart.rating.UserRatingService;
 import pl.jollycart.user.PasswordService;
 import pl.jollycart.user.UserDao;
 import pl.jollycart.user.UserHandlers;
@@ -74,6 +81,8 @@ public final class Main {
         MessageDao messageDao = new MessageDao();
         NotificationDao notificationDao = new NotificationDao();
         StoredFileDao storedFileDao = new StoredFileDao();
+        UserRatingDao userRatingDao = new UserRatingDao();
+        JobApplicationDao jobApplicationDao = new JobApplicationDao();
 
         // --- logika biznesowa ---
         PasswordHasher passwordHasher = new PasswordHasher();
@@ -117,6 +126,10 @@ public final class Main {
                 messageDao, conversationDao, storedFileDao, notificationService,
                 fileService, new ChatAttachmentValidator());
 
+        UserRatingService userRatingService = new UserRatingService(userRatingDao, userDao, offerDao);
+        JobApplicationService jobApplicationService = new JobApplicationService(
+                jobApplicationDao, offerDao, new CvFileService(fileService, storedFileDao));
+
         // --- warstwa HTTP ---
         Router router = new Router();
         new AuthHandlers(authService, registrationService).routes(router);
@@ -129,6 +142,8 @@ public final class Main {
         new ConversationHandlers(conversationService).routes(router);
         new MessageHandlers(messageService).routes(router);
         new NotificationHandlers(notificationService).routes(router);
+        new UserProfileHandlers(userRatingService).routes(router);
+        new JobApplicationHandlers(jobApplicationService).routes(router);
 
         Tomcat tomcat = EmbeddedServer.start(config, router, userDao);
         log.info("Serwer uruchomiony: http://localhost:{}", config.serverPort());

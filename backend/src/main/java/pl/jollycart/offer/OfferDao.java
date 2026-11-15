@@ -88,6 +88,14 @@ public final class OfferDao {
         );
     }
 
+    /** Tylko aktywne oferty uzytkownika, najnowsze na poczatku (profil publiczny). */
+    public List<OfferResponse> findActiveResponsesByUserId(long userId) {
+        return Db.list(
+                RESPONSE_SELECT + "WHERE o.user_id = ? AND o.status = ? ORDER BY o.created_at DESC, o.id DESC",
+                RESPONSE_MAPPER, userId, OfferStatus.ACTIVE
+        );
+    }
+
     /**
      * Wyszukiwanie: zawsze tylko ACTIVE oferty ACTIVE (niezablokowanych) uzytkownikow;
      * kazdy z pozostalych filtrow jest opcjonalny (null = pomijamy). Najnowsze na poczatku.
