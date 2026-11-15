@@ -38,6 +38,21 @@ public final class Ctx {
         return pathParams.get(name);
     }
 
+    /** Parametr sciezki jako liczba (np. id oferty); zla wartosc to blad 400. */
+    public long pathLong(String name) {
+        try {
+            return Long.parseLong(pathParams.get(name));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Nieprawidłowy identyfikator");
+        }
+    }
+
+    /** Parametr zapytania (?name=...) albo null, gdy go nie ma lub jest pusty. */
+    public String query(String name) {
+        String value = request.getParameter(name);
+        return (value == null || value.isBlank()) ? null : value;
+    }
+
     /** Czyta body jako JSON do podanego typu i waliduje je (jak @Valid @RequestBody). */
     public <T> T body(Class<T> type) throws IOException {
         T value;
@@ -74,10 +89,17 @@ public final class Ctx {
 
     /** Wysyla plik z dysku jako odpowiedz (inline), z podanym typem zawartosci. */
     public void sendFile(Path file, String contentType) throws IOException {
+        sendFile(file, contentType, file.getFileName().toString());
+    }
+
+    /** Jak wyzej, ale z nazwa pliku pokazywana przegladarce (oczyszczona z cudzyslowow i znakow sterujacych). */
+    public void sendFile(Path file, String contentType, String displayName) throws IOException {
+        String safeName = displayName.replaceAll("[\"\\\\\\p{Cntrl}]", "_");
+
         response.setStatus(200);
         response.setContentType(contentType);
         response.setContentLengthLong(Files.size(file));
-        response.setHeader("Content-Disposition", "inline; filename=\"" + file.getFileName() + "\"");
+        response.setHeader("Content-Disposition", "inline; filename=\"" + safeName + "\"");
         Files.copy(file, response.getOutputStream());
     }
 

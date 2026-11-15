@@ -1,6 +1,7 @@
 package pl.jollycart.category;
 
 import java.util.List;
+import java.util.Optional;
 
 import pl.jollycart.db.Db;
 import pl.jollycart.db.RowMapper;
@@ -13,6 +14,10 @@ public final class CategoryDao {
 
     public List<Category> findAllOrderByName() {
         return Db.list("SELECT id, name FROM categories ORDER BY name ASC", MAPPER);
+    }
+
+    public Optional<Category> findById(long id) {
+        return Db.one("SELECT id, name FROM categories WHERE id = ?", MAPPER, id);
     }
 
     public boolean existsByName(String name) {

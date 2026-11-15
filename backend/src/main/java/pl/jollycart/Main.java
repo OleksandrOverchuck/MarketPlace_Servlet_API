@@ -19,6 +19,12 @@ import pl.jollycart.category.CategoryService;
 import pl.jollycart.config.AppConfig;
 import pl.jollycart.file.FileService;
 import pl.jollycart.file.ImageFileValidator;
+import pl.jollycart.image.OfferImageDao;
+import pl.jollycart.image.OfferImageHandlers;
+import pl.jollycart.image.OfferImageService;
+import pl.jollycart.offer.OfferDao;
+import pl.jollycart.offer.OfferHandlers;
+import pl.jollycart.offer.OfferService;
 import pl.jollycart.db.Db;
 import pl.jollycart.user.PasswordService;
 import pl.jollycart.user.UserDao;
@@ -47,6 +53,8 @@ public final class Main {
         UserDao userDao = new UserDao();
         PendingRegistrationDao pendingDao = new PendingRegistrationDao();
         CategoryDao categoryDao = new CategoryDao();
+        OfferDao offerDao = new OfferDao();
+        OfferImageDao offerImageDao = new OfferImageDao();
 
         // --- logika biznesowa ---
         PasswordHasher passwordHasher = new PasswordHasher();
@@ -62,6 +70,11 @@ public final class Main {
         PasswordService passwordService = new PasswordService(userDao, passwordHasher);
         FileService fileService = new FileService(config.uploadDir());
         ImageFileValidator imageFileValidator = new ImageFileValidator();
+        // Konto wyplat sprzedawcy (Stripe) powstanie w etapie platnosci - do tego czasu
+        // zaden sprzedawca nie moze wlaczyc platnosci przez JollyCart.
+        OfferService offerService = new OfferService(offerDao, categoryDao, sellerId -> false);
+        OfferImageService offerImageService =
+                new OfferImageService(offerImageDao, offerDao, fileService, imageFileValidator);
 
         // --- dane poczatkowe (w Spring Boot: CommandLineRunner) ---
         categoryService.createInitialCategories();
@@ -75,6 +88,8 @@ public final class Main {
         new CategoryHandlers(categoryService).routes(router);
         new UserHandlers(userService, passwordService, fileService, imageFileValidator, userDao)
                 .routes(router);
+        new OfferHandlers(offerService).routes(router);
+        new OfferImageHandlers(offerImageService, fileService).routes(router);
 
         Tomcat tomcat = EmbeddedServer.start(config, router, userDao);
         log.info("Serwer uruchomiony: http://localhost:{}", config.serverPort());
