@@ -7,7 +7,15 @@ import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pl.jollycart.admin.AdminHandlers;
 import pl.jollycart.admin.AdminInitializer;
+import pl.jollycart.admin.AdminService;
+import pl.jollycart.admin.AuditLogDao;
+import pl.jollycart.admin.AuditService;
+import pl.jollycart.admin.ContentCleanupService;
+import pl.jollycart.admin.ModerationHandlers;
+import pl.jollycart.admin.ModerationService;
+import pl.jollycart.admin.StaffDao;
 import pl.jollycart.auth.AuthHandlers;
 import pl.jollycart.auth.AuthService;
 import pl.jollycart.auth.EmailService;
@@ -83,6 +91,8 @@ public final class Main {
         StoredFileDao storedFileDao = new StoredFileDao();
         UserRatingDao userRatingDao = new UserRatingDao();
         JobApplicationDao jobApplicationDao = new JobApplicationDao();
+        AuditLogDao auditLogDao = new AuditLogDao();
+        StaffDao staffDao = new StaffDao();
 
         // --- logika biznesowa ---
         PasswordHasher passwordHasher = new PasswordHasher();
@@ -130,6 +140,13 @@ public final class Main {
         JobApplicationService jobApplicationService = new JobApplicationService(
                 jobApplicationDao, offerDao, new CvFileService(fileService, storedFileDao));
 
+        AuditService auditService = new AuditService(auditLogDao);
+        ContentCleanupService contentCleanupService = new ContentCleanupService(fileService);
+        AdminService adminService =
+                new AdminService(userDao, staffDao, contentCleanupService, auditService);
+        ModerationService moderationService = new ModerationService(
+                userDao, offerDao, staffDao, contentCleanupService, auditService);
+
         // --- warstwa HTTP ---
         Router router = new Router();
         new AuthHandlers(authService, registrationService).routes(router);
@@ -144,6 +161,8 @@ public final class Main {
         new NotificationHandlers(notificationService).routes(router);
         new UserProfileHandlers(userRatingService).routes(router);
         new JobApplicationHandlers(jobApplicationService).routes(router);
+        new AdminHandlers(adminService, auditService).routes(router);
+        new ModerationHandlers(moderationService).routes(router);
 
         Tomcat tomcat = EmbeddedServer.start(config, router, userDao);
         log.info("Serwer uruchomiony: http://localhost:{}", config.serverPort());

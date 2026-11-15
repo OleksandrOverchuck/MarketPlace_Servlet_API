@@ -13,4 +13,16 @@ public class StatusException extends RuntimeException {
     public int getStatus() {
         return status;
     }
+
+    public static StatusException forbidden(String message) {
+        return new StatusException(403, message);
+    }
+
+    public static StatusException notFound(String message) {
+        return new StatusException(404, message);
+    }
+
+    public static StatusException conflict(String message) {
+        return new StatusException(409, message);
+    }
 }

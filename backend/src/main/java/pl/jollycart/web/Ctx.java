@@ -112,6 +112,21 @@ public final class Ctx {
         Files.copy(file, response.getOutputStream());
     }
 
+    /**
+     * Jak body(), ale przy bledach walidacji do mapy pol dokleja klucz "message" z pierwszym
+     * komunikatem (tak odpowiadaja endpointy panelu admina i moderacji w wersji Spring).
+     */
+    public <T> T bodyWithMessage(Class<T> type) throws IOException {
+        try {
+            return body(type);
+        } catch (RequestValidationException e) {
+            Map<String, String> errors = new java.util.LinkedHashMap<>(e.getErrors());
+            String first = errors.values().stream().findFirst().orElse("Nieprawidłowe dane");
+            errors.put("message", first);
+            throw new RequestValidationException(errors);
+        }
+    }
+
     public void json(int status, Object body) throws IOException {
         Json.write(response, status, body);
     }
