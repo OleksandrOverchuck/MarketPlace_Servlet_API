@@ -44,19 +44,48 @@ public final class EmailService {
                 + "Kod jest ważny przez " + validMinutes + " minut.\n"
                 + "Jeśli to nie Ty zakładasz konto w JollyCart, zignoruj tę wiadomość.";
 
+        send(to, "JollyCart - kod weryfikacyjny", text,
+                "Nie udało się wysłać wiadomości e-mail. Spróbuj ponownie za chwilę.");
+    }
+
+    public void sendNewMessageNotification(String to, String recipientNickname, String senderNickname,
+                                           String text, String attachmentName, String chatUrl) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("Cześć ").append(recipientNickname).append("!\n\n");
+        body.append(senderNickname).append(" wysłał(a) do Ciebie wiadomość w JollyCart:\n\n");
+
+        if (text != null && !text.isBlank()) {
+            String preview = text.length() > 500 ? text.substring(0, 500) + "..." : text;
+            body.append("\"").append(preview).append("\"\n");
+        }
+
+        if (attachmentName != null && !attachmentName.isBlank()) {
+            body.append("Załącznik: ").append(attachmentName).append("\n");
+        }
+
+        body.append("\nOdpowiedz w czacie: ").append(chatUrl).append("\n\n");
+        body.append("Aby nie zasypywać Twojej skrzynki, kolejne wiadomości ")
+                .append("z tej rozmowy w ciągu kilku minut nie będą ")
+                .append("powodować nowych maili.");
+
+        // usuwamy znaki nowej linii - ochrona przed wstrzyknieciem naglowkow
+        String subject = "JollyCart - nowa wiadomość od " + senderNickname.replaceAll("[\\r\\n]", " ");
+
+        send(to, subject, body.toString(), "Nie udało się wysłać wiadomości e-mail.");
+    }
+
+    private void send(String to, String subject, String text, String errorMessage) {
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(to, true));
-            message.setSubject("JollyCart - kod weryfikacyjny", "UTF-8");
+            message.setSubject(subject, "UTF-8");
             message.setText(text, "UTF-8");
 
             Transport.send(message);
         } catch (MessagingException e) {
-            throw new EmailSendException(
-                    "Nie udało się wysłać wiadomości e-mail. Spróbuj ponownie za chwilę.",
-                    e
-            );
+            throw new EmailSendException(errorMessage, e);
         }
     }
 }

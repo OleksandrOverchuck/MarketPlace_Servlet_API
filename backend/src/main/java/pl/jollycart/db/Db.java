@@ -34,6 +34,9 @@ public final class Db {
     /** Polaczenie biezacej transakcji (jesli jest otwarta) - jedno na watek. */
     private static final ThreadLocal<Connection> CURRENT = new ThreadLocal<>();
 
+    /** Czynnosci do wykonania po zatwierdzeniu biezacej transakcji (np. wyslanie maila). */
+    private static final ThreadLocal<List<Runnable>> AFTER_COMMIT = new ThreadLocal<>();
+
     private Db() {
     }
 
@@ -90,19 +93,53 @@ public final class Db {
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             CURRENT.set(connection);
+            AFTER_COMMIT.set(new ArrayList<>());
+
+            T result;
+            List<Runnable> callbacks;
 
             try {
-                T result = work.get();
+                result = work.get();
                 connection.commit();
-                return result;
+                callbacks = AFTER_COMMIT.get();
             } catch (Throwable t) {
                 rollbackQuietly(connection);
                 throw t;
             } finally {
                 CURRENT.remove();
+                AFTER_COMMIT.remove();
             }
+
+            runAfterCommit(callbacks);
+            return result;
         } catch (SQLException e) {
             throw new DbException("Blad transakcji", e);
+        }
+    }
+
+    /**
+     * Rejestruje czynnosc do wykonania DOPIERO po zatwierdzeniu biezacej transakcji
+     * (przy wycofaniu transakcji jest pomijana). Poza transakcja wykonuje sie od razu.
+     * Odpowiednik @TransactionalEventListener(phase = AFTER_COMMIT) ze Springa.
+     */
+    public static void afterCommit(Runnable action) {
+        List<Runnable> callbacks = AFTER_COMMIT.get();
+
+        if (callbacks == null) {
+            action.run();
+        } else {
+            callbacks.add(action);
+        }
+    }
+
+    private static void runAfterCommit(List<Runnable> callbacks) {
+        for (Runnable callback : callbacks) {
+            try {
+                callback.run();
+            } catch (RuntimeException e) {
+                // transakcja jest juz zatwierdzona - blad tylko logujemy
+                log.error("Blad czynnosci po zatwierdzeniu transakcji", e);
+            }
         }
     }
 

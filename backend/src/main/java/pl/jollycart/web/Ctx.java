@@ -103,6 +103,15 @@ public final class Ctx {
         Files.copy(file, response.getOutputStream());
     }
 
+    /** Wysyla plik z dysku z dowolnymi naglowkami odpowiedzi (np. Content-Disposition, Cache-Control). */
+    public void sendFile(Path file, String contentType, Map<String, String> headers) throws IOException {
+        response.setStatus(200);
+        response.setContentType(contentType);
+        response.setContentLengthLong(Files.size(file));
+        headers.forEach(response::setHeader);
+        Files.copy(file, response.getOutputStream());
+    }
+
     public void json(int status, Object body) throws IOException {
         Json.write(response, status, body);
     }

@@ -1,5 +1,8 @@
 package pl.jollycart;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +20,23 @@ import pl.jollycart.category.CategoryDao;
 import pl.jollycart.category.CategoryHandlers;
 import pl.jollycart.category.CategoryService;
 import pl.jollycart.config.AppConfig;
+import pl.jollycart.file.ChatAttachmentValidator;
 import pl.jollycart.file.FileService;
 import pl.jollycart.file.ImageFileValidator;
+import pl.jollycart.file.StoredFileDao;
 import pl.jollycart.image.OfferImageDao;
 import pl.jollycart.image.OfferImageHandlers;
 import pl.jollycart.image.OfferImageService;
+import pl.jollycart.message.ConversationDao;
+import pl.jollycart.message.ConversationHandlers;
+import pl.jollycart.message.ConversationService;
+import pl.jollycart.message.MessageDao;
+import pl.jollycart.message.MessageHandlers;
+import pl.jollycart.message.MessageService;
+import pl.jollycart.notification.MessageEmailListener;
+import pl.jollycart.notification.NotificationDao;
+import pl.jollycart.notification.NotificationHandlers;
+import pl.jollycart.notification.NotificationService;
 import pl.jollycart.offer.OfferDao;
 import pl.jollycart.offer.OfferHandlers;
 import pl.jollycart.offer.OfferService;
@@ -55,6 +70,10 @@ public final class Main {
         CategoryDao categoryDao = new CategoryDao();
         OfferDao offerDao = new OfferDao();
         OfferImageDao offerImageDao = new OfferImageDao();
+        ConversationDao conversationDao = new ConversationDao();
+        MessageDao messageDao = new MessageDao();
+        NotificationDao notificationDao = new NotificationDao();
+        StoredFileDao storedFileDao = new StoredFileDao();
 
         // --- logika biznesowa ---
         PasswordHasher passwordHasher = new PasswordHasher();
@@ -81,6 +100,23 @@ public final class Main {
         new AdminInitializer(userDao, passwordHasher,
                 config.adminEmail(), config.adminNickname(), config.adminPassword()).run();
 
+        // Pula watkow do zadan w tle (np. wysylka maili po zapisie wiadomosci).
+        // Odpowiednik @EnableAsync / @Async w Spring Boot. Watki "daemon" nie blokuja zamkniecia aplikacji.
+        ExecutorService asyncExecutor = Executors.newFixedThreadPool(4, runnable -> {
+            Thread thread = new Thread(runnable, "async-" + System.nanoTime());
+            thread.setDaemon(true);
+            return thread;
+        });
+
+        MessageEmailListener messageEmailListener =
+                new MessageEmailListener(emailService, config.frontendUrl());
+        NotificationService notificationService = new NotificationService(
+                notificationDao, conversationDao, messageEmailListener, asyncExecutor);
+        ConversationService conversationService = new ConversationService(conversationDao, userDao);
+        MessageService messageService = new MessageService(
+                messageDao, conversationDao, storedFileDao, notificationService,
+                fileService, new ChatAttachmentValidator());
+
         // --- warstwa HTTP ---
         Router router = new Router();
         new AuthHandlers(authService, registrationService).routes(router);
@@ -90,6 +126,9 @@ public final class Main {
                 .routes(router);
         new OfferHandlers(offerService).routes(router);
         new OfferImageHandlers(offerImageService, fileService).routes(router);
+        new ConversationHandlers(conversationService).routes(router);
+        new MessageHandlers(messageService).routes(router);
+        new NotificationHandlers(notificationService).routes(router);
 
         Tomcat tomcat = EmbeddedServer.start(config, router, userDao);
         log.info("Serwer uruchomiony: http://localhost:{}", config.serverPort());
@@ -101,6 +140,7 @@ public final class Main {
             } catch (Exception e) {
                 log.warn("Blad przy zatrzymywaniu serwera", e);
             }
+            asyncExecutor.shutdown();
             Db.close();
         }));
 
