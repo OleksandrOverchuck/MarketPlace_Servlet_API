@@ -17,8 +17,13 @@ import pl.jollycart.category.CategoryDao;
 import pl.jollycart.category.CategoryHandlers;
 import pl.jollycart.category.CategoryService;
 import pl.jollycart.config.AppConfig;
+import pl.jollycart.file.FileService;
+import pl.jollycart.file.ImageFileValidator;
 import pl.jollycart.db.Db;
+import pl.jollycart.user.PasswordService;
 import pl.jollycart.user.UserDao;
+import pl.jollycart.user.UserHandlers;
+import pl.jollycart.user.UserService;
 import pl.jollycart.web.EmbeddedServer;
 import pl.jollycart.web.Router;
 
@@ -53,6 +58,10 @@ public final class Main {
         GoogleOAuth googleOAuth = new GoogleOAuth(
                 config.googleClientId(), config.googleClientSecret());
         CategoryService categoryService = new CategoryService(categoryDao);
+        UserService userService = new UserService(userDao);
+        PasswordService passwordService = new PasswordService(userDao, passwordHasher);
+        FileService fileService = new FileService(config.uploadDir());
+        ImageFileValidator imageFileValidator = new ImageFileValidator();
 
         // --- dane poczatkowe (w Spring Boot: CommandLineRunner) ---
         categoryService.createInitialCategories();
@@ -64,6 +73,8 @@ public final class Main {
         new AuthHandlers(authService, registrationService).routes(router);
         new GoogleLoginHandlers(googleOAuth, authService, config.frontendUrl()).routes(router);
         new CategoryHandlers(categoryService).routes(router);
+        new UserHandlers(userService, passwordService, fileService, imageFileValidator, userDao)
+                .routes(router);
 
         Tomcat tomcat = EmbeddedServer.start(config, router, userDao);
         log.info("Serwer uruchomiony: http://localhost:{}", config.serverPort());

@@ -25,7 +25,8 @@ public record AppConfig(
         String googleClientSecret,
         String adminEmail,
         String adminNickname,
-        String adminPassword
+        String adminPassword,
+        String uploadDir
 ) {
 
     public static AppConfig load() {
@@ -51,7 +52,8 @@ public record AppConfig(
                 env("GOOGLE_CLIENT_SECRET", ""),
                 env("ADMIN_EMAIL", "admin@jollycart.local"),
                 env("ADMIN_NICKNAME", "admin"),
-                env("ADMIN_PASSWORD", "")
+                env("ADMIN_PASSWORD", ""),
+                env("UPLOAD_DIR", "uploads")
         );
     }
 

@@ -114,4 +114,30 @@ public final class UserDao {
                 nickname, email, passwordHash, passwordChangeRequired, now, now
         );
     }
+
+    public boolean existsByNicknameAndIdNot(String nickname, long id) {
+        return Db.exists("SELECT 1 FROM users WHERE nickname = ? AND id <> ? LIMIT 1", nickname, id);
+    }
+
+    public void updateProfile(long id, String nickname, String avatarUrl, String phone, String location) {
+        Db.update(
+                "UPDATE users SET nickname = ?, avatar_url = ?, phone = ?, location = ?, updated_at = ? "
+                        + "WHERE id = ?",
+                nickname, avatarUrl, phone, location, LocalDateTime.now(), id
+        );
+    }
+
+    public void updateAvatarUrl(long id, String avatarUrl) {
+        Db.update("UPDATE users SET avatar_url = ?, updated_at = ? WHERE id = ?",
+                avatarUrl, LocalDateTime.now(), id);
+    }
+
+    /** Ustawia nowy hash hasla i zdejmuje wymog jego zmiany. */
+    public void updatePassword(long id, String passwordHash) {
+        Db.update(
+                "UPDATE users SET password_hash = ?, password_change_required = 0, updated_at = ? "
+                        + "WHERE id = ?",
+                passwordHash, LocalDateTime.now(), id
+        );
+    }
 }

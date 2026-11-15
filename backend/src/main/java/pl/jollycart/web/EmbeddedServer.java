@@ -4,11 +4,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
 import jakarta.servlet.Filter;
+import jakarta.servlet.MultipartConfigElement;
 
 import pl.jollycart.config.AppConfig;
 import pl.jollycart.user.UserDao;
@@ -38,8 +40,15 @@ public final class EmbeddedServer {
         addFilter(context, "userStatus", new UserStatusFilter(userDao));
         addFilter(context, "authorization", new AuthorizationFilter());
 
-        Tomcat.addServlet(context, "api", new ApiServlet(router));
+        Wrapper servlet = Tomcat.addServlet(context, "api", new ApiServlet(router));
         context.addServletMappingDecoded("/", "api");
+
+        // Przesylanie plikow (multipart/form-data): limit 10 MB na plik i na zadanie,
+        // tak jak spring.servlet.multipart.max-file-size / max-request-size w wersji Spring.
+        Path multipartTmp = Files.createDirectories(baseDir.resolve("multipart-tmp"));
+        long tenMb = 10L * 1024 * 1024;
+        servlet.setMultipartConfigElement(
+                new MultipartConfigElement(multipartTmp.toString(), tenMb, tenMb, 0));
 
         tomcat.start();
         return tomcat;

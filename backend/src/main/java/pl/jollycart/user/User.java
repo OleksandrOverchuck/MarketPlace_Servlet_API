@@ -23,6 +23,12 @@ public record User(
         LocalDateTime updatedAt
 ) {
 
+    public User withAvatarUrl(String newAvatarUrl) {
+        return new User(id, nickname, email, passwordHash, authProvider, providerId, newAvatarUrl,
+                phone, location, role, status, banReason, bannedAt, bannedById,
+                passwordChangeRequired, createdAt, updatedAt);
+    }
+
     public boolean isBanned() {
         return status == AccountStatus.BANNED;
     }

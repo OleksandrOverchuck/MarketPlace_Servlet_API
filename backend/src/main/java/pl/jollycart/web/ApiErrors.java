@@ -43,6 +43,9 @@ public final class ApiErrors {
             body.put("reason", banned.getReason());
             Json.write(response, 403, body);
 
+        } else if (exception instanceof PayloadTooLargeException) {
+            Json.write(response, 413, Map.of("message", exception.getMessage()));
+
         } else if (exception instanceof EmailSendException) {
             Json.write(response, 503, Map.of("message", exception.getMessage()));
 

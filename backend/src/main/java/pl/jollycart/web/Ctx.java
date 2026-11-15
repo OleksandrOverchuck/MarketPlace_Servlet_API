@@ -1,10 +1,14 @@
 package pl.jollycart.web;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 import pl.jollycart.user.User;
 import pl.jollycart.web.filter.UserStatusFilter;
@@ -48,6 +52,33 @@ public final class Ctx {
         }
 
         return RequestValidator.validated(value);
+    }
+
+    /** Czesc zadania multipart/form-data o podanej nazwie (jak @RequestParam MultipartFile). */
+    public Part part(String name) throws IOException {
+        Part part;
+        try {
+            part = request.getPart(name);
+        } catch (ServletException e) {
+            throw new IllegalArgumentException("Żądanie musi być typu multipart/form-data");
+        } catch (IllegalStateException e) {
+            // przekroczony limit rozmiaru ustawiony w MultipartConfigElement
+            throw new PayloadTooLargeException("Plik jest zbyt duży");
+        }
+
+        if (part == null) {
+            throw new IllegalArgumentException("Brak pliku w żądaniu");
+        }
+        return part;
+    }
+
+    /** Wysyla plik z dysku jako odpowiedz (inline), z podanym typem zawartosci. */
+    public void sendFile(Path file, String contentType) throws IOException {
+        response.setStatus(200);
+        response.setContentType(contentType);
+        response.setContentLengthLong(Files.size(file));
+        response.setHeader("Content-Disposition", "inline; filename=\"" + file.getFileName() + "\"");
+        Files.copy(file, response.getOutputStream());
     }
 
     public void json(int status, Object body) throws IOException {
