@@ -30,6 +30,11 @@ public final class OrderHandlers {
         // Kupujacy rezygnuje z platnosci / front pyta Stripe, czy juz zaplacono (gdy webhook jeszcze nie dotarl)
         router.post("/api/orders/{id}/cancel", this::cancel);
         router.post("/api/orders/{id}/sync", this::sync);
+
+        // Wysylka (sprzedawca), odbior i potwierdzenie z wyplata (kupujacy)
+        router.post("/api/orders/{id}/ship", this::ship);
+        router.post("/api/orders/{id}/received", this::received);
+        router.post("/api/orders/{id}/confirm", this::confirm);
     }
 
     private void checkout(Ctx ctx) throws IOException {
@@ -64,6 +69,18 @@ public final class OrderHandlers {
 
     private void cancel(Ctx ctx) throws IOException {
         ctx.json(200, orderService.cancelPending(ctx.currentUser(), ctx.pathLong("id")));
+    }
+
+    private void ship(Ctx ctx) throws IOException {
+        ctx.json(200, orderService.markShipped(ctx.currentUser(), ctx.pathLong("id")));
+    }
+
+    private void received(Ctx ctx) throws IOException {
+        ctx.json(200, orderService.markReceived(ctx.currentUser(), ctx.pathLong("id")));
+    }
+
+    private void confirm(Ctx ctx) throws IOException {
+        ctx.json(200, orderService.confirmOrder(ctx.currentUser(), ctx.pathLong("id")));
     }
 
     private void sync(Ctx ctx) throws IOException {

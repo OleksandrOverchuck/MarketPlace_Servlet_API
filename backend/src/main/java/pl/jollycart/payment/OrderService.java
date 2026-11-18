@@ -11,11 +11,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.stripe.exception.StripeException;
+import com.stripe.model.BalanceTransaction;
+import com.stripe.model.Charge;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
+import com.stripe.model.Transfer;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
+import com.stripe.param.ChargeRetrieveParams;
 import com.stripe.param.RefundCreateParams;
+import com.stripe.param.TransferCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 
 import pl.jollycart.db.Db;
@@ -62,6 +67,8 @@ public final class OrderService {
     private final int checkoutMinutes;
     private final String frontendUrl;
     private final int shipHours;
+    private final int confirmHours;
+    private final SellerAccountDao sellerAccountDao;
     private final OrderPaidListener orderPaidListener;
     private final Executor asyncExecutor;
 
@@ -70,6 +77,7 @@ public final class OrderService {
             OrderDao orderDao,
             UserDao userDao,
             SellerAccountService sellerAccountService,
+            SellerAccountDao sellerAccountDao,
             PriceCalculator priceCalculator,
             PaymentConfig config,
             String frontendUrl,
@@ -86,6 +94,8 @@ public final class OrderService {
         this.checkoutMinutes = Math.max(30, config.checkoutMinutes());
         this.frontendUrl = frontendUrl;
         this.shipHours = config.shipHours();
+        this.confirmHours = config.confirmHours();
+        this.sellerAccountDao = sellerAccountDao;
         this.orderPaidListener = orderPaidListener;
         this.asyncExecutor = asyncExecutor;
     }
@@ -375,6 +385,71 @@ public final class OrderService {
     }
 
     // =====================================================================
+    //  3. WYSYLKA, ODBIOR, POTWIERDZENIE
+    // =====================================================================
+
+    public OrderResponse markShipped(User seller, long orderId) {
+
+        return Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            if (!order.getSellerId().equals(seller.id())) {
+                throw new IllegalArgumentException("To nie jest Twoja sprzedaż");
+            }
+
+            requireStatus(order, OrderStatus.PAID,
+                    "Wysyłkę można oznaczyć tylko dla opłaconego zamówienia");
+
+            order.setStatus(OrderStatus.SHIPPED);
+            order.setShippedAt(LocalDateTime.now());
+
+            // Kupujacy dowiaduje sie o wysylce -> czerwona kropka
+            order.setBuyerUnread(true);
+
+            orderDao.update(order);
+
+            return toResponse(order, seller.id());
+        });
+    }
+
+    /* Kupujacy odebral towar - od teraz ma confirmHours na decyzje. */
+    public OrderResponse markReceived(User buyer, long orderId) {
+
+        return Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            requireBuyer(order, buyer);
+            requireStatus(order, OrderStatus.SHIPPED,
+                    "Odbiór można potwierdzić po tym, jak sprzedawca wyśle towar");
+
+            markDelivered(order);
+            orderDao.update(order);
+
+            return toResponse(order, buyer.id());
+        });
+    }
+
+    /* Kupujacy: "towar jest OK" -> wyplata dla sprzedawcy. */
+    public OrderResponse confirmOrder(User buyer, long orderId) {
+
+        return Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            requireBuyer(order, buyer);
+
+            if (order.getStatus() != OrderStatus.SHIPPED
+                    && order.getStatus() != OrderStatus.DELIVERED) {
+                throw StatusException.conflict("Zamówienia nie można teraz potwierdzić");
+            }
+
+            releaseFunds(order);
+            orderDao.update(order);
+
+            return toResponse(order, buyer.id());
+        });
+    }
+
+    // =====================================================================
     //  5. LISTY I CZERWONA KROPKA
     // =====================================================================
 
@@ -507,6 +582,101 @@ public final class OrderService {
                 offerDao.updateStatus(offer.id(), newStatus);
             }
         });
+    }
+
+    private void markDelivered(PurchaseOrder order) {
+        LocalDateTime now = LocalDateTime.now();
+        order.setStatus(OrderStatus.DELIVERED);
+        order.setDeliveredAt(now);
+        order.setConfirmDeadline(now.plusHours(confirmHours));
+    }
+
+    /*
+     * WYPLATA: przelew ze srodkow platformy na konto Stripe sprzedawcy.
+     *
+     * source_transaction wiaze Transfer z konkretna platnoscia kupujacego,
+     * a klucz idempotencji gwarantuje, ze przy ponowieniu (np. po bledzie
+     * zapisu do bazy) pieniadze nie zostana wyplacone dwa razy.
+     * Wywolujacy zapisuje zamowienie (orderDao.update).
+     */
+    private void releaseFunds(PurchaseOrder order) {
+
+        if (order.getStripeTransferId() != null) {
+            order.setStatus(OrderStatus.COMPLETED);
+            return;
+        }
+
+        SellerAccount sellerAccount = sellerAccountDao.findByUserId(order.getSellerId())
+                .orElseThrow(() -> StatusException.conflict("Sprzedawca nie ma konta wypłat"));
+
+        // Przelew MUSI byc powiazany z platnoscia kupujacego (source_transaction).
+        String chargeId = order.getStripeChargeId();
+
+        try {
+            if ((chargeId == null || chargeId.isBlank())
+                    && order.getStripePaymentIntentId() != null) {
+                chargeId = PaymentIntent
+                        .retrieve(order.getStripePaymentIntentId())
+                        .getLatestCharge();
+                order.setStripeChargeId(chargeId);
+            }
+
+            if (chargeId == null || chargeId.isBlank()) {
+                throw StatusException.conflict("Brak powiązanej płatności - nie można wypłacić środków");
+            }
+
+            // Sprzedawca dostaje cene towaru + dostawe; oplata serwisowa zostaje
+            // u JollyCart. Stripe pobiera prowizje od platnosci kupujacego, wiec
+            // przekazujemy najwyzej kwote netto (po prowizji), inaczej przelew
+            // przekracza dostepne srodki (balance_insufficient).
+            long transferAmount = toMinorUnits(order.getSellerPayout());
+
+            Charge charge = Charge.retrieve(
+                    chargeId,
+                    ChargeRetrieveParams.builder()
+                            .addExpand("balance_transaction")
+                            .build(),
+                    null
+            );
+
+            BalanceTransaction balanceTransaction = charge.getBalanceTransactionObject();
+
+            if (balanceTransaction != null && balanceTransaction.getNet() != null) {
+                transferAmount = Math.min(transferAmount, balanceTransaction.getNet());
+            }
+
+            Transfer transfer = Transfer.create(
+                    TransferCreateParams.builder()
+                            .setAmount(transferAmount)
+                            .setCurrency(order.getCurrency())
+                            .setDestination(sellerAccount.stripeAccountId())
+                            .setSourceTransaction(chargeId)
+                            .setTransferGroup("ORDER_" + order.getId())
+                            .putMetadata("orderId", String.valueOf(order.getId()))
+                            .build(),
+                    RequestOptions.builder()
+                            // Kwota w kluczu: bezpieczne ponowienie tej samej wyplaty,
+                            // a poprawiona kwota nie koliduje z wczesniejsza nieudana proba.
+                            .setIdempotencyKey("transfer-order-" + order.getId() + "-" + transferAmount)
+                            .build()
+            );
+
+            order.setStripeTransferId(transfer.getId());
+
+        } catch (StripeException e) {
+            throw new PaymentGatewayException(
+                    "Nie udało się wypłacić środków sprzedawcy: " + e.getMessage(), e);
+        }
+
+        order.setStatus(OrderStatus.COMPLETED);
+        order.setCompletedAt(LocalDateTime.now());
+        releaseOffer(order.getOfferId(), OfferStatus.SOLD);
+    }
+
+    private void requireStatus(PurchaseOrder order, OrderStatus expected, String message) {
+        if (order.getStatus() != expected) {
+            throw StatusException.conflict(message);
+        }
     }
 
     private PurchaseOrder lockOrder(long orderId) {

@@ -155,7 +155,7 @@ public final class Main {
         PriceCalculator priceCalculator = new PriceCalculator(paymentConfig);
         OrderPaidListener orderPaidListener = new OrderPaidListener(userDao, emailService, config.frontendUrl());
         OrderService orderService = new OrderService(
-                offerDao, orderDao, userDao, sellerAccountService, priceCalculator, paymentConfig,
+                offerDao, orderDao, userDao, sellerAccountService, sellerAccountDao, priceCalculator, paymentConfig,
                 config.frontendUrl(), orderPaidListener, asyncExecutor);
         ConversationService conversationService = new ConversationService(conversationDao, userDao);
         MessageService messageService = new MessageService(
