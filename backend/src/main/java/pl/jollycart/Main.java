@@ -29,6 +29,10 @@ import pl.jollycart.category.CategoryHandlers;
 import pl.jollycart.category.CategoryService;
 import pl.jollycart.config.AppConfig;
 import pl.jollycart.file.ChatAttachmentValidator;
+import pl.jollycart.dispute.DisputeHandlers;
+import pl.jollycart.dispute.DisputeImageDao;
+import pl.jollycart.dispute.DisputeService;
+import pl.jollycart.dispute.OrderDisputeDao;
 import pl.jollycart.file.CvFileService;
 import pl.jollycart.file.FileService;
 import pl.jollycart.file.ImageFileValidator;
@@ -158,6 +162,10 @@ public final class Main {
         OrderService orderService = new OrderService(
                 offerDao, orderDao, userDao, sellerAccountService, sellerAccountDao, priceCalculator, paymentConfig,
                 config.frontendUrl(), orderPaidListener, asyncExecutor);
+
+        // Zgloszenia problemow z zamowieniami (tresc, zdjecia, decyzje moderatora)
+        DisputeService disputeService = new DisputeService(
+                new OrderDisputeDao(), new DisputeImageDao(), orderService, fileService, imageFileValidator);
         ConversationService conversationService = new ConversationService(conversationDao, userDao);
         MessageService messageService = new MessageService(
                 messageDao, conversationDao, storedFileDao, notificationService,
@@ -192,6 +200,7 @@ public final class Main {
         new ModerationHandlers(moderationService).routes(router);
         new SellerAccountHandlers(sellerAccountService).routes(router);
         new OrderHandlers(orderService).routes(router);
+        new DisputeHandlers(disputeService).routes(router);
         new PaymentWebhookHandlers(orderService, paymentConfig.stripeWebhookSecret()).routes(router);
 
         Tomcat tomcat = EmbeddedServer.start(config, router, userDao);

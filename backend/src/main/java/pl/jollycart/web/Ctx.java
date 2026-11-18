@@ -3,6 +3,8 @@ package pl.jollycart.web;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.ServletException;
@@ -85,6 +87,26 @@ public final class Ctx {
             throw new IllegalArgumentException("Brak pliku w żądaniu");
         }
         return part;
+    }
+
+    /** Wszystkie czesci multipart o podanej nazwie (jak @RequestParam List<MultipartFile>); moze byc pusta lista. */
+    public List<Part> parts(String name) throws IOException {
+        List<Part> result = new ArrayList<>();
+
+        try {
+            for (Part part : request.getParts()) {
+                if (name.equals(part.getName())) {
+                    result.add(part);
+                }
+            }
+        } catch (ServletException e) {
+            throw new IllegalArgumentException("Żądanie musi być typu multipart/form-data");
+        } catch (IllegalStateException e) {
+            // przekroczony limit rozmiaru ustawiony w MultipartConfigElement
+            throw new PayloadTooLargeException("Plik jest zbyt duży");
+        }
+
+        return result;
     }
 
     /** Wysyla plik z dysku jako odpowiedz (inline), z podanym typem zawartosci. */

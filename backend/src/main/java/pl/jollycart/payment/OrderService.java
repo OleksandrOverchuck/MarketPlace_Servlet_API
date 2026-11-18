@@ -452,6 +452,62 @@ public final class OrderService {
     }
 
     // =====================================================================
+    //  3b. SPORY (tresc zgloszenia i decyzje obsluguje pakiet dispute)
+    // =====================================================================
+
+    /* Kupujacy zglasza problem - srodki zostaja wstrzymane do decyzji administratora. */
+    public OrderResponse openDispute(User buyer, long orderId, String reason) {
+
+        return Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            requireBuyer(order, buyer);
+
+            boolean inWindow = order.getStatus() == OrderStatus.SHIPPED
+                    || (order.getStatus() == OrderStatus.DELIVERED
+                            && order.getConfirmDeadline() != null
+                            && order.getConfirmDeadline().isAfter(LocalDateTime.now()));
+
+            if (!inWindow) {
+                throw StatusException.conflict("Zgłoszenie problemu jest już niemożliwe dla tego zamówienia");
+            }
+
+            if (reason == null || reason.isBlank()) {
+                throw new IllegalArgumentException("Opisz, jaki jest problem");
+            }
+
+            order.setStatus(OrderStatus.DISPUTED);
+            order.setDisputeReason(reason.trim().length() > 500
+                    ? reason.trim().substring(0, 500)
+                    : reason.trim());
+
+            orderDao.update(order);
+
+            return toResponse(order, buyer.id());
+        });
+    }
+
+    /* Decyzja administratora: zwrot dla kupujacego albo wyplata dla sprzedawcy. */
+    public OrderResponse resolveDispute(long orderId, boolean refundBuyer) {
+
+        return Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            requireStatus(order, OrderStatus.DISPUTED, "To zamówienie nie jest w sporze");
+
+            if (refundBuyer) {
+                refundOrder(order, OfferStatus.INACTIVE);
+            } else {
+                releaseFunds(order);
+            }
+
+            orderDao.update(order);
+
+            return toResponse(order, null);
+        });
+    }
+
+    // =====================================================================
     //  4. AUTOMATY (wywolywane przez PaymentScheduler)
     //  Kazda metoda od nowa sprawdza warunek pod blokada wiersza, wiec rownolegle
     //  dzialanie uzytkownika, webhooka i schedulera jest bezpieczne.
