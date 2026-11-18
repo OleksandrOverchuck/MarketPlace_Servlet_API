@@ -73,6 +73,19 @@ public final class OfferDao {
         return Db.one("SELECT " + OFFER_COLUMNS + " FROM offers WHERE id = ?", OFFER_MAPPER, id);
     }
 
+    /**
+     * Jak findById, ale blokuje wiersz do konca transakcji (SELECT ... FOR UPDATE):
+     * dwoch kupujacych nie zarezerwuje tej samej oferty. Wywoluj w Db.inTransaction(...).
+     */
+    public Optional<Offer> findByIdForUpdate(long id) {
+        return Db.one("SELECT " + OFFER_COLUMNS + " FROM offers WHERE id = ? FOR UPDATE", OFFER_MAPPER, id);
+    }
+
+    /** Zmienia sam status oferty (np. ACTIVE -> RESERVED) i odswieza updated_at. */
+    public void updateStatus(long id, OfferStatus status) {
+        Db.update("UPDATE offers SET status = ?, updated_at = ? WHERE id = ?", status, LocalDateTime.now(), id);
+    }
+
     public boolean existsById(long id) {
         return Db.exists("SELECT 1 FROM offers WHERE id = ? LIMIT 1", id);
     }

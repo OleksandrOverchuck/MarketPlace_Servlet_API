@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import pl.jollycart.auth.AccountBannedException;
 import pl.jollycart.auth.AuthenticationFailedException;
 import pl.jollycart.auth.EmailSendException;
+import pl.jollycart.payment.PaymentGatewayException;
 
 /** Zamiana wyjatkow na odpowiedzi HTTP (odpowiednik @ExceptionHandler / @ControllerAdvice). */
 public final class ApiErrors {
@@ -51,6 +52,10 @@ public final class ApiErrors {
 
         } else if (exception instanceof EmailSendException) {
             Json.write(response, 503, Map.of("message", exception.getMessage()));
+
+        } else if (exception instanceof PaymentGatewayException) {
+            log.error("Błąd operatora płatności", exception);
+            Json.write(response, 502, Map.of("message", exception.getMessage()));
 
         } else {
             log.error("Nieobsluzony blad", exception);

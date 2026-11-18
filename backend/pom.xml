@@ -24,6 +24,7 @@
         <expressly.version>5.0.0</expressly.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <angus-mail.version>2.0.3</angus-mail.version>
+        <stripe.version>28.4.0</stripe.version>
         <slf4j.version>2.0.17</slf4j.version>
         <logback.version>1.5.18</logback.version>
     </properties>
@@ -96,6 +97,12 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+        <!-- Stripe: platnosci (Checkout), konta sprzedawcow (Connect), zwroty i przelewy -->
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>${stripe.version}</version>
         </dependency>
     </dependencies>
 

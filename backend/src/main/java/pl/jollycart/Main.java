@@ -49,9 +49,20 @@ import pl.jollycart.notification.MessageEmailListener;
 import pl.jollycart.notification.NotificationDao;
 import pl.jollycart.notification.NotificationHandlers;
 import pl.jollycart.notification.NotificationService;
+import pl.jollycart.notification.OrderPaidListener;
 import pl.jollycart.offer.OfferDao;
 import pl.jollycart.offer.OfferHandlers;
 import pl.jollycart.offer.OfferService;
+import pl.jollycart.payment.OrderDao;
+import pl.jollycart.payment.OrderHandlers;
+import pl.jollycart.payment.OrderService;
+import pl.jollycart.payment.PaymentConfig;
+import pl.jollycart.payment.PaymentWebhookHandlers;
+import pl.jollycart.payment.PriceCalculator;
+import pl.jollycart.payment.SellerAccountDao;
+import pl.jollycart.payment.SellerAccountHandlers;
+import pl.jollycart.payment.SellerAccountService;
+import pl.jollycart.payment.StripeSetup;
 import pl.jollycart.db.Db;
 import pl.jollycart.rating.UserProfileHandlers;
 import pl.jollycart.rating.UserRatingDao;
@@ -79,6 +90,10 @@ public final class Main {
 
         Db.init(config);
 
+        // Platnosci Stripe: bez STRIPE_SECRET_KEY aplikacja dziala, ale bez platnosci
+        PaymentConfig paymentConfig = PaymentConfig.load();
+        StripeSetup.init(paymentConfig);
+
         // --- warstwa danych ---
         UserDao userDao = new UserDao();
         PendingRegistrationDao pendingDao = new PendingRegistrationDao();
@@ -93,6 +108,8 @@ public final class Main {
         JobApplicationDao jobApplicationDao = new JobApplicationDao();
         AuditLogDao auditLogDao = new AuditLogDao();
         StaffDao staffDao = new StaffDao();
+        SellerAccountDao sellerAccountDao = new SellerAccountDao();
+        OrderDao orderDao = new OrderDao();
 
         // --- logika biznesowa ---
         PasswordHasher passwordHasher = new PasswordHasher();
@@ -108,9 +125,11 @@ public final class Main {
         PasswordService passwordService = new PasswordService(userDao, passwordHasher);
         FileService fileService = new FileService(config.uploadDir());
         ImageFileValidator imageFileValidator = new ImageFileValidator();
-        // Konto wyplat sprzedawcy (Stripe) powstanie w etapie platnosci - do tego czasu
-        // zaden sprzedawca nie moze wlaczyc platnosci przez JollyCart.
-        OfferService offerService = new OfferService(offerDao, categoryDao, sellerId -> false);
+        // Sprzedawca moze wlaczyc platnosc przez JollyCart dopiero, gdy Stripe potwierdzi jego konto wyplat.
+        SellerAccountService sellerAccountService = new SellerAccountService(
+                sellerAccountDao, config.frontendUrl(), paymentConfig.stripePublishableKey());
+        OfferService offerService =
+                new OfferService(offerDao, categoryDao, sellerAccountService::isPayoutReady);
         OfferImageService offerImageService =
                 new OfferImageService(offerImageDao, offerDao, fileService, imageFileValidator);
 
@@ -131,6 +150,13 @@ public final class Main {
                 new MessageEmailListener(emailService, config.frontendUrl());
         NotificationService notificationService = new NotificationService(
                 notificationDao, conversationDao, messageEmailListener, asyncExecutor);
+
+        // Zamowienia i platnosci Stripe (potrzebuja asyncExecutor do maila po zatwierdzeniu transakcji)
+        PriceCalculator priceCalculator = new PriceCalculator(paymentConfig);
+        OrderPaidListener orderPaidListener = new OrderPaidListener(userDao, emailService, config.frontendUrl());
+        OrderService orderService = new OrderService(
+                offerDao, orderDao, userDao, sellerAccountService, priceCalculator, paymentConfig,
+                config.frontendUrl(), orderPaidListener, asyncExecutor);
         ConversationService conversationService = new ConversationService(conversationDao, userDao);
         MessageService messageService = new MessageService(
                 messageDao, conversationDao, storedFileDao, notificationService,
@@ -163,6 +189,9 @@ public final class Main {
         new JobApplicationHandlers(jobApplicationService).routes(router);
         new AdminHandlers(adminService, auditService).routes(router);
         new ModerationHandlers(moderationService).routes(router);
+        new SellerAccountHandlers(sellerAccountService).routes(router);
+        new OrderHandlers(orderService).routes(router);
+        new PaymentWebhookHandlers(orderService, paymentConfig.stripeWebhookSecret()).routes(router);
 
         Tomcat tomcat = EmbeddedServer.start(config, router, userDao);
         log.info("Serwer uruchomiony: http://localhost:{}", config.serverPort());
