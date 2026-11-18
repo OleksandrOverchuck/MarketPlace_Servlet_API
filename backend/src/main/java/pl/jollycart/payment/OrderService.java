@@ -68,6 +68,7 @@ public final class OrderService {
     private final String frontendUrl;
     private final int shipHours;
     private final int confirmHours;
+    private final int autoDeliverDays;
     private final SellerAccountDao sellerAccountDao;
     private final OrderPaidListener orderPaidListener;
     private final Executor asyncExecutor;
@@ -95,6 +96,7 @@ public final class OrderService {
         this.frontendUrl = frontendUrl;
         this.shipHours = config.shipHours();
         this.confirmHours = config.confirmHours();
+        this.autoDeliverDays = config.autoDeliverDays();
         this.sellerAccountDao = sellerAccountDao;
         this.orderPaidListener = orderPaidListener;
         this.asyncExecutor = asyncExecutor;
@@ -450,6 +452,82 @@ public final class OrderService {
     }
 
     // =====================================================================
+    //  4. AUTOMATY (wywolywane przez PaymentScheduler)
+    //  Kazda metoda od nowa sprawdza warunek pod blokada wiersza, wiec rownolegle
+    //  dzialanie uzytkownika, webhooka i schedulera jest bezpieczne.
+    // =====================================================================
+
+    /* Kupujacy nie zaplacil w czasie sesji. */
+    public void expirePending(long orderId) {
+
+        Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            if (order.getStatus() != OrderStatus.PENDING_PAYMENT
+                    || order.getCheckoutExpiresAt() == null
+                    || order.getCheckoutExpiresAt().isAfter(LocalDateTime.now())) {
+                return;
+            }
+
+            settleOrCancelPending(order);
+            orderDao.update(order);
+        });
+    }
+
+    /* Sprzedawca nie wyslal towaru w terminie -> zwrot dla kupujacego. */
+    public void refundMissedShipment(long orderId) {
+
+        Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            if (order.getStatus() != OrderStatus.PAID
+                    || order.getShipDeadline() == null
+                    || order.getShipDeadline().isAfter(LocalDateTime.now())) {
+                return;
+            }
+
+            refundOrder(order, OfferStatus.ACTIVE);
+            orderDao.update(order);
+            log.info("Zamówienie {}: brak wysyłki w terminie - zwrot", order.getId());
+        });
+    }
+
+    /* Kupujacy nie kliknal "Otrzymalem" w rozsadnym czasie od wysylki. */
+    public void autoDeliver(long orderId) {
+
+        Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            if (order.getStatus() != OrderStatus.SHIPPED
+                    || order.getShippedAt() == null
+                    || order.getShippedAt().isAfter(LocalDateTime.now().minusDays(autoDeliverDays))) {
+                return;
+            }
+
+            markDelivered(order);
+            orderDao.update(order);
+        });
+    }
+
+    /* Minelo okno na potwierdzenie bez zgloszenia problemu -> wyplata. */
+    public void autoRelease(long orderId) {
+
+        Db.inTransaction(() -> {
+            PurchaseOrder order = lockOrder(orderId);
+
+            if (order.getStatus() != OrderStatus.DELIVERED
+                    || order.getConfirmDeadline() == null
+                    || order.getConfirmDeadline().isAfter(LocalDateTime.now())) {
+                return;
+            }
+
+            releaseFunds(order);
+            orderDao.update(order);
+            log.info("Zamówienie {}: brak reakcji kupującego - wypłata", order.getId());
+        });
+    }
+
+    // =====================================================================
     //  5. LISTY I CZERWONA KROPKA
     // =====================================================================
 
@@ -671,6 +749,13 @@ public final class OrderService {
         order.setStatus(OrderStatus.COMPLETED);
         order.setCompletedAt(LocalDateTime.now());
         releaseOffer(order.getOfferId(), OfferStatus.SOLD);
+    }
+
+    /* Zwrot pieniedzy kupujacemu + zwolnienie oferty. Wywolujacy zapisuje zamowienie (orderDao.update). */
+    private void refundOrder(PurchaseOrder order, OfferStatus offerStatusAfter) {
+        refundPayment(order);
+        order.setStatus(OrderStatus.REFUNDED);
+        releaseOffer(order.getOfferId(), offerStatusAfter);
     }
 
     private void requireStatus(PurchaseOrder order, OrderStatus expected, String message) {

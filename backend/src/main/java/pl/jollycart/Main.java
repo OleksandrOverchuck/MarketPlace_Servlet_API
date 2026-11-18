@@ -57,6 +57,7 @@ import pl.jollycart.payment.OrderDao;
 import pl.jollycart.payment.OrderHandlers;
 import pl.jollycart.payment.OrderService;
 import pl.jollycart.payment.PaymentConfig;
+import pl.jollycart.payment.PaymentScheduler;
 import pl.jollycart.payment.PaymentWebhookHandlers;
 import pl.jollycart.payment.PriceCalculator;
 import pl.jollycart.payment.SellerAccountDao;
@@ -194,9 +195,15 @@ public final class Main {
         new PaymentWebhookHandlers(orderService, paymentConfig.stripeWebhookSecret()).routes(router);
 
         Tomcat tomcat = EmbeddedServer.start(config, router, userDao);
+
+        // Terminy platnosci (wygasanie, zwrot za brak wysylki, auto-odbior, auto-wyplata)
+        PaymentScheduler paymentScheduler = new PaymentScheduler(orderDao, orderService, paymentConfig);
+        paymentScheduler.start();
+
         log.info("Serwer uruchomiony: http://localhost:{}", config.serverPort());
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            paymentScheduler.stop();
             try {
                 tomcat.stop();
                 tomcat.destroy();
