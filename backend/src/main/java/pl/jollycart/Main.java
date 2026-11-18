@@ -165,7 +165,7 @@ public final class Main {
 
         // Zgloszenia problemow z zamowieniami (tresc, zdjecia, decyzje moderatora)
         DisputeService disputeService = new DisputeService(
-                new OrderDisputeDao(), new DisputeImageDao(), orderService, fileService, imageFileValidator);
+                new OrderDisputeDao(), new DisputeImageDao(), orderDao, userDao, orderService, fileService, imageFileValidator);
         ConversationService conversationService = new ConversationService(conversationDao, userDao);
         MessageService messageService = new MessageService(
                 messageDao, conversationDao, storedFileDao, notificationService,
