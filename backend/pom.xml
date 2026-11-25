@@ -16,9 +16,9 @@
 
         <!-- Wersje bibliotek. tomcat.version ustaw tak samo jak w wersji Spring Boot
              (mvn dependency:tree w projekcie backend -> tomcat-embed-core). -->
-        <tomcat.version>11.0.10</tomcat.version>
-        <hikari.version>6.3.0</hikari.version>
-        <mysql.version>9.3.0</mysql.version>
+        <tomcat.version>11.0.24</tomcat.version>
+        <hikari.version>7.0.2</hikari.version>
+        <mysql.version>9.7.0</mysql.version>
         <jackson.version>2.19.2</jackson.version>
         <hibernate-validator.version>8.0.2.Final</hibernate-validator.version>
         <expressly.version>5.0.0</expressly.version>
